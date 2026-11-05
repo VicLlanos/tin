@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jordan Lee | CAD Designer</title>
+  <meta name="description" content="Portfolio of Jordan Lee – Precision CAD Designer specializing in 3D modeling, technical documentation, and product development.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Geometric background -->
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#home" class="logo">
+        <span class="logo-mark">JL</span>
+        <span class="logo-text">Jordan Lee</span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#work">Work</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero" id="home">
+    <div class="hero-content">
+      <p class="hero-tag reveal">CAD Designer · Mechanical Design</p>
+      <h1 class="hero-title reveal">
+        Designing with<br>
+        <span class="accent">precision</span> & purpose
+      </h1>
+      <p class="hero-sub reveal">
+        Transforming concepts into manufacturable products through expert 3D modeling, 
+        technical documentation, and thoughtful engineering.
+      </p>
+      <div class="hero-cta reveal">
+        <a href="#work" class="btn btn-primary">View Work</a>
+        <a href="#contact" class="btn btn-outline">Get in Touch</a>
+      </div>
+    </div>
+    <div class="hero-visual reveal">
+      <div class="cad-frame">
+        <div class="cad-axis"></div>
+        <div class="cad-model">
+          <div class="face face-front"></div>
+          <div class="face face-top"></div>
+          <div class="face face-side"></div>
+        </div>
+        <div class="cad-dim cad-dim-h"></div>
+        <div class="cad-dim cad-dim-v"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- About -->
+  <section class="section about" id="about">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">01 — About</span>
+        <h2>Engineering clarity into every model</h2>
+      </div>
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <p>
+            I’m a CAD designer focused on turning complex ideas into clean, production-ready designs. 
+            With a background in mechanical engineering and years of hands-on experience in SolidWorks, 
+            Fusion 360, and AutoCAD, I specialize in creating models that balance aesthetics, function, and manufacturability.
+          </p>
+          <p>
+            Whether it’s product development, fixture design, or detailed technical drawings, 
+            my process is rooted in precision, iteration, and clear communication with engineering and manufacturing teams.
+          </p>
+          <div class="about-stats">
+            <div class="stat">
+              <span class="stat-num">8+</span>
+              <span class="stat-label">Years Experience</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num">120+</span>
+              <span class="stat-label">Projects Delivered</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num">15+</span>
+              <span class="stat-label">Industries Served</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-card reveal">
+          <h3>Core Focus</h3>
+          <ul class="focus-list">
+            <li><span class="icon">◆</span> 3D Parametric Modeling</li>
+            <li><span class="icon">◆</span> Design for Manufacturing (DFM)</li>
+            <li><span class="icon">◆</span> Technical Documentation & GD&T</li>
+            <li><span class="icon">◆</span> Assembly & Motion Studies</li>
+            <li><span class="icon">◆</span> Rapid Prototyping Support</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section class="section skills" id="skills">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">02 — Skills</span>
+        <h2>Tools & expertise</h2>
+      </div>
+      <div class="skills-grid">
+        <div class="skill-card reveal">
+          <div class="skill-icon">SW</div>
+          <h3>SolidWorks</h3>
+          <p>Advanced part & assembly modeling, configurations, drawings, simulation basics.</p>
+        </div>
+        <div class="skill-card reveal">
+          <div class="skill-icon">F360</div>
+          <h3>Fusion 360</h3>
+          <p>Cloud-based CAD/CAM, generative design, collaborative workflows.</p>
+        </div>
+        <div class="skill-card reveal">
+          <div class="skill-icon">AC</div>
+          <h3>AutoCAD</h3>
+          <p>2D documentation, detailed layouts, legacy file conversion.</p>
+        </div>
+        <div class="skill-card reveal">
+          <div class="skill-icon">INV</div>
+          <h3>Inventor</h3>
+          <p>Parametric design, sheet metal, frame generator, iLogic.</p>
+        </div>
+        <div class="skill-card reveal">
+          <div class="skill-icon">GD&T</div>
+          <h3>GD&T</h3>
+          <p>ASME Y14.5, tolerance analysis, inspection-ready drawings.</p>
+        </div>
+        <div class="skill-card reveal">
+          <div class="skill-icon">3D</div>
+          <h3>Visualization</h3>
+          <p>KeyShot, Blender renders, exploded views, presentation models.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Work / Gallery -->
+  <section class="section work" id="work">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">03 — Selected Work</span>
+        <h2>Project gallery</h2>
+        <p class="section-desc">A selection of recent CAD and product design work. Hover for details.</p>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters reveal">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="product">Product</button>
+        <button class="filter-btn" data-filter="fixture">Fixture</button>
+        <button class="filter-btn" data-filter="assembly">Assembly</button>
+        <button class="filter-btn" data-filter="drawing">Drawing</button>
+      </div>
+
+      <div class="gallery" id="gallery">
+        <!-- Project cards -->
+        <article class="project-card reveal" data-category="product">
+          <div class="project-visual" style="--accent: #3b82f6;">
+            <div class="project-shape shape-1"></div>
+            <div class="project-overlay">
+              <span class="project-tag">Product Design</span>
+            </div>
+          </div>
+          <div class="project-info">
+            <h3>Modular Drone Frame</h3>
+            <p>Lightweight carbon-fiber compatible frame with quick-swap arms and integrated cable routing.</p>
+            <div class="project-meta">
+              <span>SolidWorks</span>
+              <span>DFM</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card reveal" data-category="fixture">
+          <div class="project-visual" style="--accent: #10b981;">
+            <div class="project-shape shape-2"></div>
+            <div class="project-overlay">
+              <span class="project-tag">Fixture</span>
+            </div>
+          </div>
+          <div class="project-info">
+            <h3>CNC Workholding Fixture</h3>
+            <p>Modular vise system with interchangeable soft jaws for high-mix low-volume production.</p>
+            <div class="project-meta">
+              <span>Inventor</span>
+              <span>GD&T</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card reveal" data-category="assembly">
+          <div class="project-visual" style="--accent: #8b5cf6;">
+            <div class="project-shape shape-3"></div>
+            <div class="project-overlay">
+              <span class="project-tag">Assembly</span>
+            </div>
+          </div>
+          <div class="project-info">
+            <h3>Robotic End Effector</h3>
+            <p>Multi-axis gripper assembly with force sensing mounts and tool-changer interface.</p>
+            <div class="project-meta">
+              <span>Fusion 360</span>
+              <span>Motion</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card reveal" data-category="product">
+          <div class="project-visual" style="--accent: #f59e0b;">
+            <div class="project-shape shape-4"></div>
+            <div class="project-overlay">
+              <span class="project-tag">Product Design</span>
+            </div>
+          </div>
+          <div class="project-info">
+            <h3>Medical Device Housing</h3>
+            <p>Ergonomic enclosure for handheld diagnostic tool, designed for injection molding and IP54 sealing.</p>
+            <div class="project-meta">
+              <span>SolidWorks</span>
+              <span>DFM</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card reveal" data-category="drawing">
+          <div class="project-visual" style="--accent: #06b6d4;">
+            <div class="project-shape shape-5"></div>
+            <div class="project-overlay">
+              <span class="project-tag">Drawing</span>
+            </div>
+          </div>
+          <div class="project-info">
+            <h3>Precision Shaft Drawing Pack</h3>
+            <p>Complete production drawings with GD&T, surface finish callouts, and inspection ballooning.</p>
+            <div class="project-meta">
+              <span>AutoCAD</span>
+              <span>GD&T</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card reveal" data-category="fixture">
+          <div class="project-visual" style="--accent: #ec4899;">
+            <div class="project-shape shape-6"></div>
+            <div class="project-overlay">
+              <span class="project-tag">Fixture</span>
+            </div>
+          </div>
+          <div class="project-info">
+            <h3>Weld Fixture Assembly</h3>
+            <p>Adjustable fixture for tubular frame welding with pneumatic clamps and laser alignment features.</p>
+            <div class="project-meta">
+              <span>SolidWorks</span>
+              <span>Assembly</span>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Upload simulation (static) -->
+      <div class="upload-zone reveal" id="uploadZone">
+        <div class="upload-inner">
+          <div class="upload-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <h3>Add New Work</h3>
+          <p>Drag & drop images or click to browse. <span class="static-note">(Static demo — no server upload)</span></p>
+          <input type="file" id="fileInput" accept="image/*" multiple hidden>
+          <button class="btn btn-outline" id="browseBtn">Browse Files</button>
+        </div>
+        <div class="upload-preview" id="uploadPreview"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="section contact" id="contact">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">04 — Contact</span>
+        <h2>Let’s build something precise</h2>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-info reveal">
+          <p>
+            Available for freelance projects, contract work, and full-time opportunities. 
+            Prefer clear briefs and collaborative engineering environments.
+          </p>
+          <div class="contact-details">
+            <a href="mailto:jordan.lee.cad@example.com" class="contact-link">
+              <span class="label">Email</span>
+              <span class="value">jordan.lee.cad@example.com</span>
+            </a>
+            <a href="#" class="contact-link">
+              <span class="label">LinkedIn</span>
+              <span class="value">/in/jordanleecad</span>
+            </a>
+            <a href="#" class="contact-link">
+              <span class="label">Location</span>
+              <span class="value">Austin, TX · Remote</span>
+            </a>
+          </div>
+        </div>
+        <form class="contact-form reveal" id="contactForm">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required placeholder="you@company.com">
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="5" required placeholder="Project details, timeline, or just say hello..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Send Message</button>
+          <p class="form-note">Static form — opens your email client on submit.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="logo-mark">JL</span>
+          <span>Jordan Lee · CAD Designer</span>
+        </div>
+        <p class="footer-copy">Designed with precision. Built for clarity.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
