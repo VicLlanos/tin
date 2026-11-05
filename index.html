@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jordan Lee | CAD Designer</title>
-  <meta name="description" content="Portfolio of Jordan Lee – Precision CAD Designer specializing in 3D modeling, technical documentation, and product development.">
+  <title>Justine Nagrampa | CAD Designer</title>
+  <meta name="description" content="Portfolio of Justine Nagrampa – CAD Designer specializing in product design, 3D modeling, and templating.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -14,13 +14,19 @@
   <!-- Geometric background -->
   <div class="bg-grid"></div>
   <div class="bg-glow"></div>
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="float-shape s1"></div>
+    <div class="float-shape s2"></div>
+    <div class="float-shape s3"></div>
+    <div class="float-shape s4"></div>
+  </div>
 
   <!-- Navigation -->
   <nav class="navbar" id="navbar">
     <div class="nav-container">
       <a href="#home" class="logo">
-        <span class="logo-mark">JL</span>
-        <span class="logo-text">Jordan Lee</span>
+        <span class="logo-mark">JN</span>
+        <span class="logo-text">Justine Nagrampa</span>
       </a>
       <ul class="nav-links" id="navLinks">
         <li><a href="#home">Home</a></li>
@@ -38,30 +44,74 @@
   <!-- Hero -->
   <header class="hero" id="home">
     <div class="hero-content">
-      <p class="hero-tag reveal">CAD Designer · Mechanical Design</p>
+      <p class="hero-tag reveal">CAD Designer · Product Design & Templating</p>
       <h1 class="hero-title reveal">
         Designing with<br>
         <span class="accent">precision</span> & purpose
       </h1>
       <p class="hero-sub reveal">
-        Transforming concepts into manufacturable products through expert 3D modeling, 
-        technical documentation, and thoughtful engineering.
+        Transforming concepts into production-ready designs through expert 3D modeling, 
+        product development, and precise templating.
       </p>
       <div class="hero-cta reveal">
         <a href="#work" class="btn btn-primary">View Work</a>
         <a href="#contact" class="btn btn-outline">Get in Touch</a>
       </div>
     </div>
+
     <div class="hero-visual reveal">
-      <div class="cad-frame">
-        <div class="cad-axis"></div>
-        <div class="cad-model">
-          <div class="face face-front"></div>
-          <div class="face face-top"></div>
-          <div class="face face-side"></div>
+      <div class="scene">
+        <!-- Main animated assembly -->
+        <div class="assembly" id="mainAssembly">
+          <!-- Base platform -->
+          <div class="part base">
+            <div class="face f-front"></div>
+            <div class="face f-back"></div>
+            <div class="face f-left"></div>
+            <div class="face f-right"></div>
+            <div class="face f-top"></div>
+            <div class="face f-bottom"></div>
+          </div>
+          <!-- Vertical column -->
+          <div class="part column">
+            <div class="face f-front"></div>
+            <div class="face f-back"></div>
+            <div class="face f-left"></div>
+            <div class="face f-right"></div>
+            <div class="face f-top"></div>
+            <div class="face f-bottom"></div>
+          </div>
+          <!-- Arm / beam -->
+          <div class="part arm">
+            <div class="face f-front"></div>
+            <div class="face f-back"></div>
+            <div class="face f-left"></div>
+            <div class="face f-right"></div>
+            <div class="face f-top"></div>
+            <div class="face f-bottom"></div>
+          </div>
+          <!-- Small detail block -->
+          <div class="part detail">
+            <div class="face f-front"></div>
+            <div class="face f-back"></div>
+            <div class="face f-left"></div>
+            <div class="face f-right"></div>
+            <div class="face f-top"></div>
+            <div class="face f-bottom"></div>
+          </div>
         </div>
-        <div class="cad-dim cad-dim-h"></div>
-        <div class="cad-dim cad-dim-v"></div>
+
+        <!-- Orbiting elements -->
+        <div class="orbit orbit-1">
+          <div class="orbit-dot"></div>
+        </div>
+        <div class="orbit orbit-2">
+          <div class="orbit-dot"></div>
+        </div>
+
+        <!-- Dimension lines -->
+        <div class="dim-line dim-h"></div>
+        <div class="dim-line dim-v"></div>
       </div>
     </div>
   </header>
@@ -71,42 +121,42 @@
     <div class="container">
       <div class="section-header reveal">
         <span class="section-label">01 — About</span>
-        <h2>Engineering clarity into every model</h2>
+        <h2>Precision in every detail</h2>
       </div>
       <div class="about-grid">
         <div class="about-text reveal">
           <p>
-            I’m a CAD designer focused on turning complex ideas into clean, production-ready designs. 
-            With a background in mechanical engineering and years of hands-on experience in SolidWorks, 
-            Fusion 360, and AutoCAD, I specialize in creating models that balance aesthetics, function, and manufacturability.
+            I’m a CAD designer with two years of extensive experience in product design and templating 
+            at <strong>ISHIP LOGIPACK INCORPORATED</strong>. I specialize in turning concepts into clean, 
+            production-ready models and accurate templates that support efficient manufacturing.
           </p>
           <p>
-            Whether it’s product development, fixture design, or detailed technical drawings, 
-            my process is rooted in precision, iteration, and clear communication with engineering and manufacturing teams.
+            My work focuses on practical product development — creating detailed 3D models, 
+            precise templates, and clear documentation that bridge design intent with real-world production needs.
           </p>
           <div class="about-stats">
             <div class="stat">
-              <span class="stat-num">8+</span>
+              <span class="stat-num">2+</span>
               <span class="stat-label">Years Experience</span>
             </div>
             <div class="stat">
-              <span class="stat-num">120+</span>
-              <span class="stat-label">Projects Delivered</span>
+              <span class="stat-num">ISHIP</span>
+              <span class="stat-label">Logipack Inc.</span>
             </div>
             <div class="stat">
-              <span class="stat-num">15+</span>
-              <span class="stat-label">Industries Served</span>
+              <span class="stat-num">Product</span>
+              <span class="stat-label">Design Focus</span>
             </div>
           </div>
         </div>
         <div class="about-card reveal">
           <h3>Core Focus</h3>
           <ul class="focus-list">
-            <li><span class="icon">◆</span> 3D Parametric Modeling</li>
-            <li><span class="icon">◆</span> Design for Manufacturing (DFM)</li>
-            <li><span class="icon">◆</span> Technical Documentation & GD&T</li>
-            <li><span class="icon">◆</span> Assembly & Motion Studies</li>
-            <li><span class="icon">◆</span> Rapid Prototyping Support</li>
+            <li><span class="icon">◆</span> Product Design & Development</li>
+            <li><span class="icon">◆</span> 3D Modeling & Parametric Design</li>
+            <li><span class="icon">◆</span> Templating & Pattern Work</li>
+            <li><span class="icon">◆</span> Technical Documentation</li>
+            <li><span class="icon">◆</span> Design for Manufacturing</li>
           </ul>
         </div>
       </div>
@@ -124,32 +174,32 @@
         <div class="skill-card reveal">
           <div class="skill-icon">SW</div>
           <h3>SolidWorks</h3>
-          <p>Advanced part & assembly modeling, configurations, drawings, simulation basics.</p>
+          <p>Part & assembly modeling, configurations, detailed drawings, and design intent.</p>
         </div>
         <div class="skill-card reveal">
           <div class="skill-icon">F360</div>
           <h3>Fusion 360</h3>
-          <p>Cloud-based CAD/CAM, generative design, collaborative workflows.</p>
+          <p>Cloud CAD, collaborative design, and rapid product development workflows.</p>
         </div>
         <div class="skill-card reveal">
           <div class="skill-icon">AC</div>
           <h3>AutoCAD</h3>
-          <p>2D documentation, detailed layouts, legacy file conversion.</p>
+          <p>2D documentation, templates, layouts, and precise technical drawings.</p>
         </div>
         <div class="skill-card reveal">
-          <div class="skill-icon">INV</div>
-          <h3>Inventor</h3>
-          <p>Parametric design, sheet metal, frame generator, iLogic.</p>
+          <div class="skill-icon">TMPL</div>
+          <h3>Templating</h3>
+          <p>Accurate pattern creation, nesting, and production-ready templates.</p>
         </div>
         <div class="skill-card reveal">
-          <div class="skill-icon">GD&T</div>
-          <h3>GD&T</h3>
-          <p>ASME Y14.5, tolerance analysis, inspection-ready drawings.</p>
+          <div class="skill-icon">DFM</div>
+          <h3>DFM</h3>
+          <p>Design for manufacturability, material considerations, and process alignment.</p>
         </div>
         <div class="skill-card reveal">
-          <div class="skill-icon">3D</div>
-          <h3>Visualization</h3>
-          <p>KeyShot, Blender renders, exploded views, presentation models.</p>
+          <div class="skill-icon">DOC</div>
+          <h3>Documentation</h3>
+          <p>Clear technical packs, exploded views, and production instructions.</p>
         </div>
       </div>
     </div>
@@ -161,124 +211,114 @@
       <div class="section-header reveal">
         <span class="section-label">03 — Selected Work</span>
         <h2>Project gallery</h2>
-        <p class="section-desc">A selection of recent CAD and product design work. Hover for details.</p>
+        <p class="section-desc">Selected product design, modeling, and technical drawing work.</p>
       </div>
 
-      <!-- Filters -->
       <div class="filters reveal">
         <button class="filter-btn active" data-filter="all">All</button>
         <button class="filter-btn" data-filter="product">Product</button>
-        <button class="filter-btn" data-filter="fixture">Fixture</button>
-        <button class="filter-btn" data-filter="assembly">Assembly</button>
+        <button class="filter-btn" data-filter="template">Template</button>
         <button class="filter-btn" data-filter="drawing">Drawing</button>
+        <button class="filter-btn" data-filter="assembly">Assembly</button>
       </div>
 
       <div class="gallery" id="gallery">
-        <!-- Project cards -->
+        <!-- Product -->
         <article class="project-card reveal" data-category="product">
-          <div class="project-visual" style="--accent: #3b82f6;">
-            <div class="project-shape shape-1"></div>
-            <div class="project-overlay">
-              <span class="project-tag">Product Design</span>
+          <div class="project-visual visual-3d" style="--c: #3b82f6;">
+            <div class="mini-model m1">
+              <div class="m-face"></div>
+              <div class="m-face"></div>
+              <div class="m-face"></div>
             </div>
+            <div class="project-overlay"><span class="project-tag">Product Design</span></div>
           </div>
           <div class="project-info">
-            <h3>Modular Drone Frame</h3>
-            <p>Lightweight carbon-fiber compatible frame with quick-swap arms and integrated cable routing.</p>
-            <div class="project-meta">
-              <span>SolidWorks</span>
-              <span>DFM</span>
-            </div>
+            <h3>Packaging Component Set</h3>
+            <p>Modular product housing designed for efficient assembly and material optimization.</p>
+            <div class="project-meta"><span>SolidWorks</span><span>DFM</span></div>
           </div>
         </article>
 
-        <article class="project-card reveal" data-category="fixture">
-          <div class="project-visual" style="--accent: #10b981;">
-            <div class="project-shape shape-2"></div>
-            <div class="project-overlay">
-              <span class="project-tag">Fixture</span>
-            </div>
+        <!-- Template -->
+        <article class="project-card reveal" data-category="template">
+          <div class="project-visual visual-template" style="--c: #10b981;">
+            <div class="blueprint-grid"></div>
+            <div class="template-shape"></div>
+            <div class="project-overlay"><span class="project-tag">Template</span></div>
           </div>
           <div class="project-info">
-            <h3>CNC Workholding Fixture</h3>
-            <p>Modular vise system with interchangeable soft jaws for high-mix low-volume production.</p>
-            <div class="project-meta">
-              <span>Inventor</span>
-              <span>GD&T</span>
-            </div>
+            <h3>Production Template Pack</h3>
+            <p>Precision templates and patterns for consistent manufacturing output at scale.</p>
+            <div class="project-meta"><span>AutoCAD</span><span>Templating</span></div>
           </div>
         </article>
 
-        <article class="project-card reveal" data-category="assembly">
-          <div class="project-visual" style="--accent: #8b5cf6;">
-            <div class="project-shape shape-3"></div>
-            <div class="project-overlay">
-              <span class="project-tag">Assembly</span>
-            </div>
-          </div>
-          <div class="project-info">
-            <h3>Robotic End Effector</h3>
-            <p>Multi-axis gripper assembly with force sensing mounts and tool-changer interface.</p>
-            <div class="project-meta">
-              <span>Fusion 360</span>
-              <span>Motion</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="project-card reveal" data-category="product">
-          <div class="project-visual" style="--accent: #f59e0b;">
-            <div class="project-shape shape-4"></div>
-            <div class="project-overlay">
-              <span class="project-tag">Product Design</span>
-            </div>
-          </div>
-          <div class="project-info">
-            <h3>Medical Device Housing</h3>
-            <p>Ergonomic enclosure for handheld diagnostic tool, designed for injection molding and IP54 sealing.</p>
-            <div class="project-meta">
-              <span>SolidWorks</span>
-              <span>DFM</span>
-            </div>
-          </div>
-        </article>
-
+        <!-- Drawing -->
         <article class="project-card reveal" data-category="drawing">
-          <div class="project-visual" style="--accent: #06b6d4;">
-            <div class="project-shape shape-5"></div>
-            <div class="project-overlay">
-              <span class="project-tag">Drawing</span>
+          <div class="project-visual visual-drawing" style="--c: #06b6d4;">
+            <div class="drawing-lines">
+              <span></span><span></span><span></span><span></span>
+              <span class="dim"></span><span class="dim"></span>
             </div>
+            <div class="project-overlay"><span class="project-tag">Technical Drawing</span></div>
           </div>
           <div class="project-info">
-            <h3>Precision Shaft Drawing Pack</h3>
-            <p>Complete production drawings with GD&T, surface finish callouts, and inspection ballooning.</p>
-            <div class="project-meta">
-              <span>AutoCAD</span>
-              <span>GD&T</span>
-            </div>
+            <h3>Detailed Part Drawing</h3>
+            <p>Full production drawings with dimensions, tolerances, and clear callouts.</p>
+            <div class="project-meta"><span>AutoCAD</span><span>GD&T</span></div>
           </div>
         </article>
 
-        <article class="project-card reveal" data-category="fixture">
-          <div class="project-visual" style="--accent: #ec4899;">
-            <div class="project-shape shape-6"></div>
-            <div class="project-overlay">
-              <span class="project-tag">Fixture</span>
+        <!-- Assembly -->
+        <article class="project-card reveal" data-category="assembly">
+          <div class="project-visual visual-3d" style="--c: #8b5cf6;">
+            <div class="mini-model m2">
+              <div class="m-face"></div>
+              <div class="m-face"></div>
+              <div class="m-face"></div>
             </div>
+            <div class="project-overlay"><span class="project-tag">Assembly</span></div>
           </div>
           <div class="project-info">
-            <h3>Weld Fixture Assembly</h3>
-            <p>Adjustable fixture for tubular frame welding with pneumatic clamps and laser alignment features.</p>
-            <div class="project-meta">
-              <span>SolidWorks</span>
-              <span>Assembly</span>
+            <h3>Multi-Part Assembly</h3>
+            <p>Complex assembly modeling with clear mate relationships and motion studies.</p>
+            <div class="project-meta"><span>SolidWorks</span><span>Assembly</span></div>
+          </div>
+        </article>
+
+        <!-- Drawing 2 -->
+        <article class="project-card reveal" data-category="drawing">
+          <div class="project-visual visual-drawing" style="--c: #f59e0b;">
+            <div class="drawing-lines alt">
+              <span></span><span></span><span></span>
+              <span class="dim"></span><span class="dim"></span>
             </div>
+            <div class="project-overlay"><span class="project-tag">Technical Drawing</span></div>
+          </div>
+          <div class="project-info">
+            <h3>Exploded View Package</h3>
+            <p>Exploded assembly drawings with item balloons and parts list for production.</p>
+            <div class="project-meta"><span>SolidWorks</span><span>Documentation</span></div>
+          </div>
+        </article>
+
+        <!-- Template 2 -->
+        <article class="project-card reveal" data-category="template">
+          <div class="project-visual visual-template" style="--c: #ec4899;">
+            <div class="blueprint-grid"></div>
+            <div class="template-shape alt"></div>
+            <div class="project-overlay"><span class="project-tag">Template</span></div>
+          </div>
+          <div class="project-info">
+            <h3>Nesting Template Layout</h3>
+            <p>Optimized nesting templates to maximize material yield and reduce waste.</p>
+            <div class="project-meta"><span>AutoCAD</span><span>Templating</span></div>
           </div>
         </article>
       </div>
 
-      <!-- Upload simulation (static) -->
+      <!-- Upload zone -->
       <div class="upload-zone reveal" id="uploadZone">
         <div class="upload-inner">
           <div class="upload-icon">
@@ -308,21 +348,21 @@
       <div class="contact-grid">
         <div class="contact-info reveal">
           <p>
-            Available for freelance projects, contract work, and full-time opportunities. 
-            Prefer clear briefs and collaborative engineering environments.
+            Open to freelance projects, contract work, and full-time opportunities. 
+            Prefer clear briefs and collaborative design environments.
           </p>
           <div class="contact-details">
-            <a href="mailto:jordan.lee.cad@example.com" class="contact-link">
+            <a href="mailto:justine.nagrampa@example.com" class="contact-link">
               <span class="label">Email</span>
-              <span class="value">jordan.lee.cad@example.com</span>
+              <span class="value">justine.nagrampa@example.com</span>
             </a>
             <a href="#" class="contact-link">
               <span class="label">LinkedIn</span>
-              <span class="value">/in/jordanleecad</span>
+              <span class="value">/in/justinenagrampa</span>
             </a>
             <a href="#" class="contact-link">
-              <span class="label">Location</span>
-              <span class="value">Austin, TX · Remote</span>
+              <span class="label">Company</span>
+              <span class="value">ISHIP LOGIPACK INC.</span>
             </a>
           </div>
         </div>
@@ -351,8 +391,8 @@
     <div class="container">
       <div class="footer-inner">
         <div class="footer-brand">
-          <span class="logo-mark">JL</span>
-          <span>Jordan Lee · CAD Designer</span>
+          <span class="logo-mark">JN</span>
+          <span>Justine Nagrampa · CAD Designer</span>
         </div>
         <p class="footer-copy">Designed with precision. Built for clarity.</p>
       </div>

@@ -1,22 +1,28 @@
-# Jordan Lee — CAD Designer Portfolio
+# Justine Nagrampa — CAD Designer Portfolio
 
-A modern, minimal, static portfolio website designed for a CAD / mechanical design professional.
+Modern, minimal, immersive static portfolio for a CAD / product design professional.
 
 ## Features
 
-- **Dark, precision-focused aesthetic** with geometric grid background and subtle blue accent
-- **Animated 3D CAD-style hero visual** (CSS 3D cube + floating animation)
-- **Scroll-triggered reveal animations** on all major sections
-- **Project gallery** with category filters (Product, Fixture, Assembly, Drawing)
-- **Drag-and-drop image upload zone** (client-side only — previews images locally, no server)
-- **Responsive design** (desktop → mobile)
-- **Contact form** that opens the user’s email client (mailto)
-- Clean Inter + JetBrains Mono typography
+- **Immersive 3D hero** — multi-part CSS 3D assembly that continuously rotates, with orbiting elements and dimension lines
+- **Floating ambient geometry** in the background
+- **Technical drawing & template cards** in the gallery (blueprint-style visuals)
+- **Scroll-triggered reveal animations**
+- **Category filters**: Product · Template · Drawing · Assembly
+- **Drag-and-drop image upload zone** (client-side preview only)
+- **Fully responsive** (desktop → tablet → mobile)
+- **Contact form** opens the user’s email client
+
+## Profile
+
+- **Justine Nagrampa**
+- CAD Designer focused on product design & templating
+- 2+ years at **ISHIP LOGIPACK INCORPORATED**
 
 ## How to use
 
-1. Open `index.html` in any modern browser.
-2. Or serve the folder with any static server:
+1. Open `index.html` in any modern browser  
+2. Or serve the folder:
    ```bash
    npx serve .
    # or
@@ -25,11 +31,10 @@ A modern, minimal, static portfolio website designed for a CAD / mechanical desi
 
 ## Customization
 
-- Replace the name, bio, stats, and contact details in `index.html`
+- Edit name, bio, company, and contact details in `index.html`
 - Update project cards in the gallery section
 - Change colors via CSS variables at the top of `styles.css`
-- The upload zone is intentionally static (no backend). For a real app you’d connect it to a service like Cloudinary, Firebase, or your own API.
 
 ## Tech
 
-Pure HTML, CSS, and vanilla JavaScript. No frameworks or build step required.
+Pure HTML, CSS & vanilla JavaScript. No frameworks or build step required.

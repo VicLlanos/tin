@@ -1,4 +1,4 @@
-/* Jordan Lee — CAD Portfolio Interactions */
+/* Justine Nagrampa — CAD Portfolio Interactions */
 
 document.addEventListener('DOMContentLoaded', () => {
   // Navbar scroll effect
@@ -32,8 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
-          // Optional: unobserve after reveal for performance
-          // revealObserver.unobserve(entry.target);
         }
       });
     },
@@ -49,17 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => {
       filterBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-
       const filter = btn.dataset.filter;
 
       projectCards.forEach(card => {
         const category = card.dataset.category;
         if (filter === 'all' || category === filter) {
           card.classList.remove('hidden');
-          // Re-trigger reveal animation lightly
-          card.style.animation = 'none';
-          card.offsetHeight; // reflow
-          card.style.animation = null;
         } else {
           card.classList.add('hidden');
         }
@@ -75,31 +68,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   browseBtn?.addEventListener('click', () => fileInput.click());
 
-  // Drag & drop
   ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    uploadZone?.addEventListener(eventName, preventDefaults, false);
+    uploadZone?.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
   });
-
-  function preventDefaults(e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
 
   ['dragenter', 'dragover'].forEach(eventName => {
-    uploadZone?.addEventListener(eventName, () => {
-      uploadZone.classList.add('dragover');
-    });
+    uploadZone?.addEventListener(eventName, () => uploadZone.classList.add('dragover'));
   });
-
   ['dragleave', 'drop'].forEach(eventName => {
-    uploadZone?.addEventListener(eventName, () => {
-      uploadZone.classList.remove('dragover');
-    });
+    uploadZone?.addEventListener(eventName, () => uploadZone.classList.remove('dragover'));
   });
 
   uploadZone?.addEventListener('drop', (e) => {
-    const files = e.dataTransfer.files;
-    handleFiles(files);
+    handleFiles(e.dataTransfer.files);
   });
 
   fileInput?.addEventListener('change', () => {
@@ -108,10 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function handleFiles(files) {
     if (!files || !files.length) return;
-
     [...files].forEach(file => {
       if (!file.type.startsWith('image/')) return;
-
       const reader = new FileReader();
       reader.onload = (e) => {
         const item = document.createElement('div');
@@ -120,19 +102,15 @@ document.addEventListener('DOMContentLoaded', () => {
           <img src="${e.target.result}" alt="${file.name}">
           <button class="remove" aria-label="Remove">×</button>
         `;
-        item.querySelector('.remove').addEventListener('click', () => {
-          item.remove();
-        });
+        item.querySelector('.remove').addEventListener('click', () => item.remove());
         uploadPreview.appendChild(item);
       };
       reader.readAsDataURL(file);
     });
-
-    // Reset input so same file can be selected again
     fileInput.value = '';
   }
 
-  // Contact form (static — mailto fallback)
+  // Contact form (mailto)
   const contactForm = document.getElementById('contactForm');
   contactForm?.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -141,13 +119,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const message = document.getElementById('message').value.trim();
 
     const subject = encodeURIComponent(`Portfolio Inquiry from ${name}`);
-    const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\n\n${message}`
-    );
+    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
+    window.location.href = `mailto:justine.nagrampa@example.com?subject=${subject}&body=${body}`;
 
-    window.location.href = `mailto:jordan.lee.cad@example.com?subject=${subject}&body=${body}`;
-
-    // Optional visual feedback
     const btn = contactForm.querySelector('button[type="submit"]');
     const original = btn.textContent;
     btn.textContent = 'Opening email…';
@@ -157,23 +131,4 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.disabled = false;
     }, 2000);
   });
-
-  // Smooth active nav highlight (optional polish)
-  const sections = document.querySelectorAll('section[id], header[id]');
-  const navItems = document.querySelectorAll('.nav-links a');
-
-  const sectionObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const id = entry.target.getAttribute('id');
-          navItems.forEach(link => {
-            link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
-          });
-        }
-      });
-    },
-    { threshold: 0.35 }
-  );
-  sections.forEach(sec => sectionObserver.observe(sec));
 });
