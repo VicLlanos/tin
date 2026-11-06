@@ -178,7 +178,7 @@
       <div class="section-header reveal">
         <span class="section-label">03 — Selected Work</span>
         <h2>Project gallery</h2>
-        <p class="section-desc">A closer look at product thinking, CAD modeling, and the details that make ideas buildable.</p>
+        <p class="section-desc">A closer look at product thinking, CAD modeling, and the details that make ideas buildable. Click any card to explore the model and read the full story.</p>
       </div>
 
       <div class="filters reveal">
@@ -191,7 +191,7 @@
 
       <div class="gallery" id="gallery">
         <!-- Product -->
-        <article class="project-card reveal" data-category="product">
+        <article class="project-card reveal" data-category="product" data-project="housing">
           <div class="project-visual model-visual">
             <canvas class="project-model" data-model="housing" aria-label="3D product housing model"></canvas>
             <div class="project-overlay"><span class="project-tag">Product Design</span></div>
@@ -204,7 +204,7 @@
         </article>
 
         <!-- Template -->
-        <article class="project-card reveal" data-category="template">
+        <article class="project-card reveal" data-category="template" data-project="template">
           <div class="project-visual drawing-visual">
             <canvas class="project-model" data-model="template" aria-label="Precision production template drawing"></canvas>
             <div class="project-overlay"><span class="project-tag">Template</span></div>
@@ -217,7 +217,7 @@
         </article>
 
         <!-- Drawing -->
-        <article class="project-card reveal" data-category="drawing">
+        <article class="project-card reveal" data-category="drawing" data-project="drawing">
           <div class="project-visual drawing-visual">
             <canvas class="project-model" data-model="drawing" aria-label="Orthographic technical drawing"></canvas>
             <div class="project-overlay"><span class="project-tag">Technical Drawing</span></div>
@@ -230,7 +230,7 @@
         </article>
 
         <!-- Assembly -->
-        <article class="project-card reveal" data-category="assembly">
+        <article class="project-card reveal" data-category="assembly" data-project="assembly">
           <div class="project-visual model-visual">
             <canvas class="project-model" data-model="assembly" aria-label="Exploded mechanical assembly model"></canvas>
             <div class="project-overlay"><span class="project-tag">Assembly</span></div>
@@ -243,7 +243,7 @@
         </article>
 
         <!-- Drawing 2 -->
-        <article class="project-card reveal" data-category="drawing">
+        <article class="project-card reveal" data-category="drawing" data-project="exploded">
           <div class="project-visual drawing-visual">
             <canvas class="project-model" data-model="exploded" aria-label="Exploded assembly technical view"></canvas>
             <div class="project-overlay"><span class="project-tag">Technical Drawing</span></div>
@@ -256,7 +256,7 @@
         </article>
 
         <!-- Template 2 -->
-        <article class="project-card reveal" data-category="template">
+        <article class="project-card reveal" data-category="template" data-project="nesting">
           <div class="project-visual drawing-visual">
             <canvas class="project-model" data-model="nesting" aria-label="Nesting template layout"></canvas>
             <div class="project-overlay"><span class="project-tag">Template</span></div>
@@ -349,6 +349,27 @@
       </div>
     </div>
   </footer>
+
+  <!-- Project Detail Modal -->
+  <div class="project-modal" id="projectModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+    <div class="project-modal-backdrop" id="modalBackdrop"></div>
+    <div class="project-modal-inner">
+      <button class="project-modal-close" id="modalClose" aria-label="Close project detail">×</button>
+      <div class="project-modal-content">
+        <div class="project-modal-viewer">
+          <div class="modal-viewer-label">ISOMETRIC VIEW · DRAG TO ORBIT</div>
+          <canvas id="modalModel" aria-label="Interactive isometric 3D model of the selected project"></canvas>
+        </div>
+        <div class="project-modal-details">
+          <span class="modal-kicker" id="modalKicker">PRODUCT DESIGN</span>
+          <h3 id="modalTitle">Project Title</h3>
+          <p class="modal-description" id="modalDescription">Project description will appear here.</p>
+          <div class="modal-specs" id="modalSpecs"></div>
+          <div class="modal-tags" id="modalTags"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="script.js"></script>
 </body>
