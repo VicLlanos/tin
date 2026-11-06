@@ -1,40 +1,13 @@
 # Justine Nagrampa — CAD Designer Portfolio
 
-Modern, minimal, immersive static portfolio for a CAD / product design professional.
+Responsive portfolio built with HTML, CSS, vanilla JavaScript and Three.js.
 
-## Features
+## Run locally
+The site uses JavaScript modules and Three.js from a CDN. Run through a local server:
+`python -m http.server 8000`, then open `http://localhost:8000`.
 
-- **Immersive 3D hero** — multi-part CSS 3D assembly that continuously rotates, with orbiting elements and dimension lines
-- **Floating ambient geometry** in the background
-- **Technical drawing & template cards** in the gallery (blueprint-style visuals)
-- **Scroll-triggered reveal animations**
-- **Category filters**: Product · Template · Drawing · Assembly
-- **Drag-and-drop image upload zone** (client-side preview only)
-- **Fully responsive** (desktop → tablet → mobile)
-- **Contact form** opens the user’s email client
+## 3D visuals
+The hero contains an interactive mesh-based precision bench vise assembly. Gallery visuals are separate 3D mesh scenes for a product housing, mechanical assembly, production template, nesting layout and orthographic technical drawing. Drag the hero model to orbit and scroll to zoom.
 
-## Profile
-
-- **Justine Nagrampa**
-- CAD Designer focused on product design & templating
-- 2+ years at **ISHIP LOGIPACK INCORPORATED**
-
-## How to use
-
-1. Open `index.html` in any modern browser  
-2. Or serve the folder:
-   ```bash
-   npx serve .
-   # or
-   python -m http.server 8000
-   ```
-
-## Customization
-
-- Edit name, bio, company, and contact details in `index.html`
-- Update project cards in the gallery section
-- Change colors via CSS variables at the top of `styles.css`
-
-## Tech
-
-Pure HTML, CSS & vanilla JavaScript. No frameworks or build step required.
+## Before publishing
+Replace placeholder contact details and illustrative project examples with the portfolio owner's real contact information, project renders and verified project descriptions. The upload area is a local browser preview only; it does not upload or persist files.

@@ -3,812 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Justine Nagrampa | CAD Designer · 3D Portfolio</title>
+  <title>Justine Nagrampa | CAD Designer</title>
   <meta name="description" content="Portfolio of Justine Nagrampa – CAD Designer specializing in product design, 3D modeling, and templating.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    /* ========== GLOBAL & VARIABLES ========== */
-    :root {
-      --bg: #0a0c10;
-      --bg-elevated: #12151c;
-      --bg-card: #161a22;
-      --border: #1e2430;
-      --border-hover: #2a3344;
-      --text: #e8eaef;
-      --text-muted: #8b93a7;
-      --text-dim: #5c6578;
-      --accent: #3b82f6;
-      --accent-soft: rgba(59, 130, 246, 0.15);
-      --accent-glow: rgba(59, 130, 246, 0.35);
-      --radius: 12px;
-      --radius-sm: 8px;
-      --font: 'Inter', system-ui, -apple-system, sans-serif;
-      --mono: 'JetBrains Mono', ui-monospace, monospace;
-      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; font-size: 16px; }
-    body {
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ========== BACKGROUND ========== */
-    .bg-grid {
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
-      background-size: 60px 60px;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .bg-glow {
-      position: fixed;
-      top: -20%; left: 50%;
-      transform: translateX(-50%);
-      width: 80vw; height: 60vh;
-      background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
-      opacity: 0.25;
-      pointer-events: none;
-      z-index: 0;
-      filter: blur(80px);
-    }
-    .floating-shapes {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-    .float-shape {
-      position: absolute;
-      border: 1px solid rgba(59, 130, 246, 0.15);
-      border-radius: 4px;
-      opacity: 0.4;
-    }
-    .float-shape.s1 { width: 80px; height: 80px; top: 15%; left: 8%; animation: floatA 18s ease-in-out infinite; }
-    .float-shape.s2 { width: 50px; height: 50px; top: 60%; right: 10%; border-radius: 50%; animation: floatB 22s ease-in-out infinite; }
-    .float-shape.s3 { width: 60px; height: 60px; bottom: 20%; left: 15%; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); animation: floatA 20s ease-in-out infinite reverse; }
-    .float-shape.s4 { width: 40px; height: 40px; top: 30%; right: 20%; animation: floatB 16s ease-in-out infinite reverse; }
-
-    @keyframes floatA {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      33% { transform: translate(20px, -30px) rotate(8deg); }
-      66% { transform: translate(-15px, 15px) rotate(-5deg); }
-    }
-    @keyframes floatB {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      50% { transform: translate(-25px, 20px) rotate(12deg); }
-    }
-
-    a { color: inherit; text-decoration: none; }
-    img { max-width: 100%; display: block; }
-    .container {
-      width: 100%;
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 0 24px;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* ========== BUTTONS ========== */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 12px 24px;
-      font-size: 0.95rem;
-      font-weight: 500;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      transition: all var(--transition);
-      font-family: inherit;
-    }
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 0 0 0 var(--accent-glow);
-    }
-    .btn-primary:hover {
-      background: #2563eb;
-      box-shadow: 0 0 24px var(--accent-glow);
-      transform: translateY(-1px);
-    }
-    .btn-outline {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border-hover);
-    }
-    .btn-outline:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: var(--accent-soft);
-    }
-    .btn-full { width: 100%; }
-
-    /* ========== NAVBAR ========== */
-    .navbar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      padding: 16px 0;
-      transition: background var(--transition), backdrop-filter var(--transition), border-color var(--transition);
-      border-bottom: 1px solid transparent;
-    }
-    .navbar.scrolled {
-      background: rgba(10, 12, 16, 0.85);
-      backdrop-filter: blur(16px);
-      border-bottom-color: var(--border);
-    }
-    .nav-container {
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 1rem; }
-    .logo-mark {
-      display: grid;
-      place-items: center;
-      width: 36px; height: 36px;
-      background: var(--accent);
-      color: #fff;
-      border-radius: 8px;
-      font-family: var(--mono);
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-    .logo-text { letter-spacing: -0.02em; }
-    .nav-links { display: flex; list-style: none; gap: 32px; }
-    .nav-links a {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      transition: color var(--transition);
-      position: relative;
-    }
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: -4px; left: 0;
-      width: 0; height: 1.5px;
-      background: var(--accent);
-      transition: width var(--transition);
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-links a:hover::after { width: 100%; }
-
-    .nav-toggle {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px;
-      z-index: 110;
-    }
-    .nav-toggle span {
-      display: block;
-      width: 22px; height: 2px;
-      background: var(--text);
-      border-radius: 1px;
-      transition: all var(--transition);
-    }
-
-    /* ========== HERO ========== */
-    .hero {
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-      gap: 48px;
-      padding: 120px 24px 80px;
-      max-width: 1120px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-    }
-    .hero-tag {
-      font-family: var(--mono);
-      font-size: 0.8rem;
-      color: var(--accent);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 16px;
-    }
-    .hero-title {
-      font-size: clamp(2.4rem, 5vw, 3.75rem);
-      font-weight: 700;
-      line-height: 1.1;
-      letter-spacing: -0.03em;
-      margin-bottom: 20px;
-    }
-    .hero-title .accent { color: var(--accent); }
-    .hero-sub {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      max-width: 480px;
-      margin-bottom: 32px;
-      line-height: 1.7;
-    }
-    .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
-
-    /* ============================================
-       REAL 3D ASSEMBLY – MULTI-PART CUBOID MECHANISM
-       ============================================ */
-    .hero-visual {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      perspective: 1200px;
-      min-height: 340px;
-    }
-    .scene {
-      position: relative;
-      width: 320px;
-      height: 320px;
-      transform-style: preserve-3d;
-    }
-
-    .assembly {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      transform-style: preserve-3d;
-      animation: assemblyRotate 24s linear infinite;
-      transform-origin: center center;
-    }
-
-    @keyframes assemblyRotate {
-      from { transform: rotateX(-22deg) rotateY(0deg); }
-      to   { transform: rotateX(-22deg) rotateY(360deg); }
-    }
-
-    .part {
-      position: absolute;
-      transform-style: preserve-3d;
-    }
-
-    .face {
-      position: absolute;
-      background: linear-gradient(145deg, rgba(59,130,246,0.28), rgba(59,130,246,0.06));
-      border: 1px solid rgba(59,130,246,0.55);
-      backface-visibility: visible;
-      box-shadow: inset 0 0 12px rgba(59,130,246,0.08);
-    }
-
-    /* Base plate – wide, thin, offset */
-    .base {
-      width: 160px; height: 18px;
-      transform: translateY(70px) translateZ(-20px);
-    }
-    .base .f-front  { width: 160px; height: 18px; transform: translateZ(80px); }
-    .base .f-back   { width: 160px; height: 18px; transform: rotateY(180deg) translateZ(80px); }
-    .base .f-left   { width: 160px; height: 18px; transform: rotateY(-90deg) translateZ(80px); }
-    .base .f-right  { width: 160px; height: 18px; transform: rotateY(90deg) translateZ(80px); }
-    .base .f-top    { width: 160px; height: 160px; transform: rotateX(90deg) translateZ(9px); background: linear-gradient(145deg, rgba(59,130,246,0.4), rgba(59,130,246,0.12)); }
-    .base .f-bottom { width: 160px; height: 160px; transform: rotateX(-90deg) translateZ(9px); }
-
-    /* Central column – taller */
-    .column {
-      width: 30px; height: 110px;
-      transform: translateY(-10px) translateZ(0);
-    }
-    .column .f-front  { width: 30px; height: 110px; transform: translateZ(15px); }
-    .column .f-back   { width: 30px; height: 110px; transform: rotateY(180deg) translateZ(15px); }
-    .column .f-left   { width: 30px; height: 110px; transform: rotateY(-90deg) translateZ(15px); }
-    .column .f-right  { width: 30px; height: 110px; transform: rotateY(90deg) translateZ(15px); }
-    .column .f-top    { width: 30px; height: 30px; transform: rotateX(90deg) translateZ(55px); background: linear-gradient(145deg, rgba(59,130,246,0.45), rgba(59,130,246,0.18)); }
-    .column .f-bottom { width: 30px; height: 30px; transform: rotateX(-90deg) translateZ(55px); }
-
-    /* Horizontal arm – extends outward, pivots */
-    .arm {
-      width: 100px; height: 20px;
-      transform: translate(48px, -52px) translateZ(10px);
-      animation: armSwing 6s ease-in-out infinite alternate;
-    }
-    @keyframes armSwing {
-      0% { transform: translate(44px, -52px) translateZ(10px) rotateZ(0deg); }
-      100% { transform: translate(56px, -52px) translateZ(10px) rotateZ(2deg); }
-    }
-    .arm .f-front  { width: 100px; height: 20px; transform: translateZ(10px); }
-    .arm .f-back   { width: 100px; height: 20px; transform: rotateY(180deg) translateZ(10px); }
-    .arm .f-left   { width: 20px; height: 20px; transform: rotateY(-90deg) translateZ(10px); }
-    .arm .f-right  { width: 20px; height: 20px; transform: rotateY(90deg) translateZ(50px); }
-    .arm .f-top    { width: 100px; height: 20px; transform: rotateX(90deg) translateZ(10px); }
-    .arm .f-bottom { width: 100px; height: 20px; transform: rotateX(-90deg) translateZ(10px); }
-
-    /* Detail block – small cube at arm end, spins independently */
-    .detail {
-      width: 40px; height: 40px;
-      transform: translate(80px, -62px) translateZ(15px);
-      animation: detailSpin 10s linear infinite;
-    }
-    @keyframes detailSpin {
-      from { transform: translate(80px, -62px) translateZ(15px) rotateY(0deg); }
-      to   { transform: translate(80px, -62px) translateZ(15px) rotateY(360deg); }
-    }
-    .detail .f-front  { width: 40px; height: 40px; transform: translateZ(20px); background: linear-gradient(145deg, rgba(59,130,246,0.6), rgba(59,130,246,0.2)); }
-    .detail .f-back   { width: 40px; height: 40px; transform: rotateY(180deg) translateZ(20px); }
-    .detail .f-left   { width: 40px; height: 40px; transform: rotateY(-90deg) translateZ(20px); }
-    .detail .f-right  { width: 40px; height: 40px; transform: rotateY(90deg) translateZ(20px); }
-    .detail .f-top    { width: 40px; height: 40px; transform: rotateX(90deg) translateZ(20px); }
-    .detail .f-bottom { width: 40px; height: 40px; transform: rotateX(-90deg) translateZ(20px); }
-
-    /* Extra small connector piece for liveliness */
-    .connector {
-      width: 18px; height: 18px;
-      transform: translate(-30px, -20px) translateZ(30px);
-      animation: connectorFloat 5s ease-in-out infinite alternate;
-    }
-    @keyframes connectorFloat {
-      0% { transform: translate(-30px, -20px) translateZ(30px) rotateY(0deg); }
-      100% { transform: translate(-30px, -20px) translateZ(30px) rotateY(180deg); }
-    }
-    .connector .f-front  { width: 18px; height: 18px; transform: translateZ(9px); background: linear-gradient(145deg, rgba(59,130,246,0.5), rgba(59,130,246,0.15)); }
-    .connector .f-back   { width: 18px; height: 18px; transform: rotateY(180deg) translateZ(9px); }
-    .connector .f-left   { width: 18px; height: 18px; transform: rotateY(-90deg) translateZ(9px); }
-    .connector .f-right  { width: 18px; height: 18px; transform: rotateY(90deg) translateZ(9px); }
-    .connector .f-top    { width: 18px; height: 18px; transform: rotateX(90deg) translateZ(9px); }
-    .connector .f-bottom { width: 18px; height: 18px; transform: rotateX(-90deg) translateZ(9px); }
-
-    /* Orbits & dots */
-    .orbit {
-      position: absolute;
-      inset: 0;
-      border: 1px dashed rgba(59,130,246,0.18);
-      border-radius: 50%;
-      animation: orbitSpin 14s linear infinite;
-    }
-    .orbit-1 { transform: rotateX(70deg); }
-    .orbit-2 {
-      transform: rotateX(70deg) rotateZ(60deg);
-      animation-duration: 20s;
-      animation-direction: reverse;
-    }
-    .orbit-dot {
-      position: absolute;
-      top: -5px; left: 50%;
-      width: 10px; height: 10px;
-      margin-left: -5px;
-      background: var(--accent);
-      border-radius: 50%;
-      box-shadow: 0 0 16px var(--accent);
-    }
-
-    @keyframes orbitSpin {
-      from { transform: rotateX(70deg) rotateZ(0deg); }
-      to   { transform: rotateX(70deg) rotateZ(360deg); }
-    }
-
-    /* Dimension lines */
-    .dim-line { position: absolute; background: var(--accent); opacity: 0.45; }
-    .dim-h {
-      width: 180px; height: 1px;
-      bottom: 12px; left: 50%;
-      transform: translateX(-50%);
-    }
-    .dim-h::before, .dim-h::after {
-      content: '';
-      position: absolute;
-      width: 1px; height: 8px;
-      background: var(--accent);
-      top: -3.5px;
-    }
-    .dim-h::before { left: 0; }
-    .dim-h::after { right: 0; }
-    .dim-v {
-      width: 1px; height: 180px;
-      right: 12px; top: 50%;
-      transform: translateY(-50%);
-    }
-    .dim-v::before, .dim-v::after {
-      content: '';
-      position: absolute;
-      height: 1px; width: 8px;
-      background: var(--accent);
-      left: -3.5px;
-    }
-    .dim-v::before { top: 0; }
-    .dim-v::after { bottom: 0; }
-
-    /* ========== SECTIONS ========== */
-    .section { padding: 100px 0; position: relative; z-index: 1; }
-    .section-header { margin-bottom: 48px; }
-    .section-label {
-      display: inline-block;
-      font-family: var(--mono);
-      font-size: 0.8rem;
-      color: var(--accent);
-      letter-spacing: 0.06em;
-      margin-bottom: 12px;
-    }
-    .section-header h2 {
-      font-size: clamp(1.75rem, 3.5vw, 2.5rem);
-      font-weight: 650;
-      letter-spacing: -0.02em;
-      line-height: 1.2;
-    }
-    .section-desc { color: var(--text-muted); margin-top: 12px; max-width: 480px; }
-
-    /* About */
-    .about-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 48px; align-items: start; }
-    .about-text p { color: var(--text-muted); margin-bottom: 20px; font-size: 1.05rem; }
-    .about-text strong { color: var(--text); font-weight: 600; }
-    .about-stats {
-      display: flex;
-      gap: 40px;
-      margin-top: 36px;
-      padding-top: 32px;
-      border-top: 1px solid var(--border);
-    }
-    .stat-num { display: block; font-size: 1.75rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
-    .stat-label { font-size: 0.85rem; color: var(--text-dim); }
-    .about-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px;
-    }
-    .about-card h3 {
-      font-size: 0.95rem;
-      font-weight: 600;
-      margin-bottom: 20px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .focus-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
-    .focus-list li { display: flex; align-items: center; gap: 12px; font-size: 0.95rem; }
-    .focus-list .icon { color: var(--accent); font-size: 0.7rem; }
-
-    /* Skills */
-    .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-    .skill-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px 24px;
-      transition: all var(--transition);
-    }
-    .skill-card:hover { border-color: var(--border-hover); transform: translateY(-4px); box-shadow: var(--shadow); }
-    .skill-icon {
-      font-family: var(--mono);
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--accent);
-      background: var(--accent-soft);
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 6px;
-      margin-bottom: 16px;
-    }
-    .skill-card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
-    .skill-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.55; }
-
-    /* Work / Gallery */
-    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 36px; }
-    .filter-btn {
-      padding: 8px 18px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all var(--transition);
-      font-family: inherit;
-    }
-    .filter-btn:hover, .filter-btn.active {
-      background: var(--accent-soft);
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-    .project-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      transition: all var(--transition);
-      cursor: pointer;
-    }
-    .project-card:hover { border-color: var(--border-hover); transform: translateY(-6px); box-shadow: var(--shadow); }
-    .project-card.hidden { display: none; }
-
-    .project-visual {
-      height: 180px;
-      background: linear-gradient(145deg, var(--bg-elevated), var(--bg-card));
-      position: relative;
-      overflow: hidden;
-      display: grid;
-      place-items: center;
-    }
-
-    /* Mini 3D models in cards */
-    .visual-3d .mini-model {
-      width: 70px; height: 70px;
-      position: relative;
-      transform-style: preserve-3d;
-      animation: miniFloat 5s ease-in-out infinite;
-    }
-    .visual-3d .m1 { animation-delay: 0s; }
-    .visual-3d .m2 { animation-delay: 1.2s; }
-    @keyframes miniFloat {
-      0%, 100% { transform: rotateX(-20deg) rotateY(25deg) translateY(0); }
-      50% { transform: rotateX(-20deg) rotateY(40deg) translateY(-8px); }
-    }
-    .mini-model .m-face {
-      position: absolute;
-      width: 70px; height: 70px;
-      border: 1.5px solid var(--c, var(--accent));
-      background: linear-gradient(135deg, color-mix(in srgb, var(--c) 20%, transparent), transparent);
-    }
-    .mini-model .m-face:nth-child(1) { transform: translateZ(35px); }
-    .mini-model .m-face:nth-child(2) { transform: rotateY(90deg) translateZ(35px); }
-    .mini-model .m-face:nth-child(3) { transform: rotateX(90deg) translateZ(35px); }
-
-    /* Technical drawing style */
-    .visual-drawing { background: #0d1117; }
-    .drawing-lines { position: relative; width: 120px; height: 90px; }
-    .drawing-lines span { position: absolute; background: var(--c, #06b6d4); opacity: 0.7; }
-    .drawing-lines span:nth-child(1) { width: 100%; height: 1.5px; top: 20%; left: 0; }
-    .drawing-lines span:nth-child(2) { width: 1.5px; height: 70%; top: 15%; left: 30%; }
-    .drawing-lines span:nth-child(3) { width: 60%; height: 1.5px; top: 55%; left: 20%; }
-    .drawing-lines span:nth-child(4) { width: 1.5px; height: 40%; top: 40%; left: 70%; }
-    .drawing-lines .dim { background: transparent !important; border: 1px solid var(--c); opacity: 0.5; }
-    .drawing-lines .dim:nth-child(5) { width: 80%; height: 12px; top: 75%; left: 10%; border-top: none; }
-    .drawing-lines .dim:nth-child(6) { width: 12px; height: 50%; top: 20%; left: 85%; border-left: none; }
-    .drawing-lines.alt span:nth-child(1) { width: 70%; top: 30%; left: 15%; }
-    .drawing-lines.alt span:nth-child(2) { left: 50%; height: 55%; }
-
-    /* Template / blueprint style */
-    .visual-template { background: #0a1628; }
-    .blueprint-grid {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(16,185,129,0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(16,185,129,0.08) 1px, transparent 1px);
-      background-size: 16px 16px;
-    }
-    .template-shape {
-      width: 80px; height: 60px;
-      border: 2px solid var(--c, #10b981);
-      border-radius: 4px;
-      position: relative;
-      background: color-mix(in srgb, var(--c) 10%, transparent);
-    }
-    .template-shape::before {
-      content: '';
-      position: absolute;
-      width: 30px; height: 20px;
-      border: 1.5px dashed var(--c);
-      top: -12px; right: -8px;
-      opacity: 0.7;
-    }
-    .template-shape.alt { border-radius: 50% 4px 50% 4px; width: 70px; height: 70px; }
-
-    .project-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(10,12,16,0.75), transparent 60%);
-      display: flex;
-      align-items: flex-end;
-      padding: 16px;
-      opacity: 0;
-      transition: opacity var(--transition);
-    }
-    .project-card:hover .project-overlay { opacity: 1; }
-    .project-tag {
-      font-size: 0.75rem;
-      font-family: var(--mono);
-      color: #fff;
-      background: rgba(0,0,0,0.45);
-      padding: 4px 10px;
-      border-radius: 4px;
-      backdrop-filter: blur(4px);
-    }
-    .project-info { padding: 20px; }
-    .project-info h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.01em; }
-    .project-info p { font-size: 0.875rem; color: var(--text-muted); line-height: 1.55; margin-bottom: 14px; }
-    .project-meta { display: flex; gap: 8px; flex-wrap: wrap; }
-    .project-meta span {
-      font-size: 0.75rem;
-      font-family: var(--mono);
-      color: var(--text-dim);
-      background: var(--bg-elevated);
-      padding: 3px 8px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-    }
-
-    /* Upload zone */
-    .upload-zone {
-      margin-top: 56px;
-      border: 1.5px dashed var(--border-hover);
-      border-radius: var(--radius);
-      background: var(--bg-elevated);
-      transition: all var(--transition);
-      overflow: hidden;
-    }
-    .upload-zone.dragover { border-color: var(--accent); background: var(--accent-soft); }
-    .upload-inner { padding: 48px 24px; text-align: center; }
-    .upload-icon { color: var(--text-dim); margin-bottom: 16px; transition: color var(--transition); }
-    .upload-zone.dragover .upload-icon { color: var(--accent); }
-    .upload-inner h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
-    .upload-inner p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; }
-    .static-note { font-size: 0.8rem; color: var(--text-dim); font-style: italic; }
-    .upload-preview {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 12px;
-      padding: 0 24px 24px;
-    }
-    .upload-preview:empty { display: none; }
-    .preview-item {
-      position: relative;
-      aspect-ratio: 1;
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      border: 1px solid var(--border);
-      animation: fadeIn 0.4s ease;
-    }
-    .preview-item img { width: 100%; height: 100%; object-fit: cover; }
-    .preview-item .remove {
-      position: absolute;
-      top: 6px; right: 6px;
-      width: 24px; height: 24px;
-      border-radius: 50%;
-      background: rgba(0,0,0,0.7);
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      display: grid;
-      place-items: center;
-      opacity: 0;
-      transition: opacity var(--transition);
-    }
-    .preview-item:hover .remove { opacity: 1; }
-    @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-
-    /* Contact */
-    .contact-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 56px; align-items: start; }
-    .contact-info p { color: var(--text-muted); font-size: 1.05rem; margin-bottom: 32px; line-height: 1.7; }
-    .contact-details { display: flex; flex-direction: column; gap: 20px; }
-    .contact-link { display: flex; flex-direction: column; gap: 2px; transition: color var(--transition); }
-    .contact-link:hover .value { color: var(--accent); }
-    .contact-link .label {
-      font-size: 0.75rem;
-      font-family: var(--mono);
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .contact-link .value { font-size: 1rem; font-weight: 500; transition: color var(--transition); }
-    .contact-form {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 32px;
-    }
-    .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-muted); margin-bottom: 8px; }
-    .form-group input, .form-group textarea {
-      width: 100%;
-      padding: 12px 14px;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.95rem;
-      transition: border-color var(--transition), box-shadow var(--transition);
-      outline: none;
-    }
-    .form-group input:focus, .form-group textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-soft);
-    }
-    .form-group textarea { resize: vertical; min-height: 120px; }
-    .form-note { font-size: 0.8rem; color: var(--text-dim); text-align: center; margin-top: 14px; }
-
-    /* Footer */
-    .footer { padding: 40px 0; border-top: 1px solid var(--border); position: relative; z-index: 1; }
-    .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-    .footer-brand { display: flex; align-items: center; gap: 12px; font-size: 0.9rem; color: var(--text-muted); }
-    .footer-brand .logo-mark { width: 28px; height: 28px; font-size: 0.7rem; }
-    .footer-copy { font-size: 0.85rem; color: var(--text-dim); }
-
-    /* Reveal animations */
-    .reveal {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-                  transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-    .skills-grid .skill-card:nth-child(1) { transition-delay: 0.05s; }
-    .skills-grid .skill-card:nth-child(2) { transition-delay: 0.1s; }
-    .skills-grid .skill-card:nth-child(3) { transition-delay: 0.15s; }
-    .skills-grid .skill-card:nth-child(4) { transition-delay: 0.2s; }
-    .skills-grid .skill-card:nth-child(5) { transition-delay: 0.25s; }
-    .skills-grid .skill-card:nth-child(6) { transition-delay: 0.3s; }
-    .gallery .project-card:nth-child(1) { transition-delay: 0.05s; }
-    .gallery .project-card:nth-child(2) { transition-delay: 0.1s; }
-    .gallery .project-card:nth-child(3) { transition-delay: 0.15s; }
-    .gallery .project-card:nth-child(4) { transition-delay: 0.2s; }
-    .gallery .project-card:nth-child(5) { transition-delay: 0.25s; }
-    .gallery .project-card:nth-child(6) { transition-delay: 0.3s; }
-
-    /* ========== RESPONSIVE ========== */
-    @media (max-width: 900px) {
-      .hero { grid-template-columns: 1fr; text-align: center; padding-top: 140px; gap: 40px; }
-      .hero-sub { margin-left: auto; margin-right: auto; }
-      .hero-cta { justify-content: center; }
-      .hero-visual { order: -1; min-height: 280px; }
-      .scene { width: 260px; height: 260px; }
-      .about-grid, .contact-grid { grid-template-columns: 1fr; }
-      .skills-grid, .gallery { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 640px) {
-      .nav-links {
-        position: fixed;
-        top: 0; right: 0;
-        height: 100vh;
-        width: min(280px, 80vw);
-        background: var(--bg-elevated);
-        flex-direction: column;
-        padding: 90px 32px 32px;
-        gap: 24px;
-        transform: translateX(100%);
-        transition: transform var(--transition);
-        border-left: 1px solid var(--border);
-        z-index: 105;
-      }
-      .nav-links.open { transform: translateX(0); }
-      .nav-toggle { display: flex; }
-      .nav-toggle.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-      .nav-toggle.active span:nth-child(2) { opacity: 0; }
-      .nav-toggle.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-      .skills-grid, .gallery { grid-template-columns: 1fr; }
-      .about-stats { flex-direction: column; gap: 20px; }
-      .hero-title { font-size: 2.2rem; }
-      .section { padding: 72px 0; }
-      .scene { width: 210px; height: 210px; }
-      .logo-text { font-size: 0.9rem; }
-      .contact-form { padding: 24px; }
-      .filters { gap: 6px; }
-      .filter-btn { padding: 7px 14px; font-size: 0.8rem; }
-    }
-    @media (max-width: 400px) {
-      .hero { padding: 110px 16px 60px; }
-      .container { padding: 0 16px; }
-      .hero-title { font-size: 1.9rem; }
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Background -->
+  <!-- Geometric background -->
   <div class="bg-grid"></div>
   <div class="bg-glow"></div>
   <div class="floating-shapes" aria-hidden="true">
@@ -843,12 +46,11 @@
     <div class="hero-content">
       <p class="hero-tag reveal">CAD Designer · Product Design & Templating</p>
       <h1 class="hero-title reveal">
-        Designing with<br>
-        <span class="accent">precision</span> & purpose
+        Making ideas<br>
+        <span class="accent">precision</span> feel possible
       </h1>
       <p class="hero-sub reveal">
-        Transforming concepts into production-ready designs through expert 3D modeling, 
-        product development, and precise templating.
+        Curious by nature, precise by practice. I turn real-world problems into thoughtful products, clear drawings, and production-ready designs.
       </p>
       <div class="hero-cta reveal">
         <a href="#work" class="btn btn-primary">View Work</a>
@@ -857,63 +59,17 @@
     </div>
 
     <div class="hero-visual reveal">
-      <div class="scene">
-        <!-- Real 3D assembly – multiple cuboid parts -->
-        <div class="assembly" id="mainAssembly">
-          <!-- Base plate -->
-          <div class="part base">
-            <div class="face f-front"></div>
-            <div class="face f-back"></div>
-            <div class="face f-left"></div>
-            <div class="face f-right"></div>
-            <div class="face f-top"></div>
-            <div class="face f-bottom"></div>
-          </div>
-          <!-- Vertical column -->
-          <div class="part column">
-            <div class="face f-front"></div>
-            <div class="face f-back"></div>
-            <div class="face f-left"></div>
-            <div class="face f-right"></div>
-            <div class="face f-top"></div>
-            <div class="face f-bottom"></div>
-          </div>
-          <!-- Horizontal arm -->
-          <div class="part arm">
-            <div class="face f-front"></div>
-            <div class="face f-back"></div>
-            <div class="face f-left"></div>
-            <div class="face f-right"></div>
-            <div class="face f-top"></div>
-            <div class="face f-bottom"></div>
-          </div>
-          <!-- Detail block at arm end -->
-          <div class="part detail">
-            <div class="face f-front"></div>
-            <div class="face f-back"></div>
-            <div class="face f-left"></div>
-            <div class="face f-right"></div>
-            <div class="face f-top"></div>
-            <div class="face f-bottom"></div>
-          </div>
-          <!-- Extra connector piece for liveliness -->
-          <div class="part connector">
-            <div class="face f-front"></div>
-            <div class="face f-back"></div>
-            <div class="face f-left"></div>
-            <div class="face f-right"></div>
-            <div class="face f-top"></div>
-            <div class="face f-bottom"></div>
-          </div>
+      <div class="hero-scene-shell">
+        <div class="scene-topline"><span class="live-dot"></span> LIVE 3D MODEL VIEW</div>
+        <canvas id="heroModel" aria-label="Interactive 3D precision bench vise model"></canvas>
+        <div class="scene-caption">
+          <span class="caption-kicker">ASSEMBLY STUDY / 001</span>
+          <strong>Precision Bench Vise</strong>
+          <span>Drag to orbit · Scroll to zoom</span>
         </div>
-
-        <!-- Orbits & dots -->
-        <div class="orbit orbit-1"><div class="orbit-dot"></div></div>
-        <div class="orbit orbit-2"><div class="orbit-dot"></div></div>
-
-        <!-- Dimension lines -->
-        <div class="dim-line dim-h"></div>
-        <div class="dim-line dim-v"></div>
+        <div class="scene-callout callout-one"><i></i> Sliding jaw</div>
+        <div class="scene-callout callout-two"><i></i> Lead screw</div>
+        <div class="scene-axis">X&nbsp; / &nbsp;Y&nbsp; / &nbsp;Z</div>
       </div>
     </div>
   </header>
@@ -923,7 +79,7 @@
     <div class="container">
       <div class="section-header reveal">
         <span class="section-label">01 — About</span>
-        <h2>Precision in every detail</h2>
+        <h2>A little curiosity. A lot of precision.</h2>
       </div>
       <div class="about-grid">
         <div class="about-text reveal">
@@ -1013,7 +169,7 @@
       <div class="section-header reveal">
         <span class="section-label">03 — Selected Work</span>
         <h2>Project gallery</h2>
-        <p class="section-desc">Selected product design, modeling, and technical drawing work.</p>
+        <p class="section-desc">A closer look at product thinking, CAD modeling, and the details that make ideas buildable.</p>
       </div>
 
       <div class="filters reveal">
@@ -1025,13 +181,10 @@
       </div>
 
       <div class="gallery" id="gallery">
+        <!-- Product -->
         <article class="project-card reveal" data-category="product">
-          <div class="project-visual visual-3d" style="--c: #3b82f6;">
-            <div class="mini-model m1">
-              <div class="m-face"></div>
-              <div class="m-face"></div>
-              <div class="m-face"></div>
-            </div>
+          <div class="project-visual model-visual">
+            <canvas class="project-model" data-model="housing" aria-label="3D product housing model"></canvas>
             <div class="project-overlay"><span class="project-tag">Product Design</span></div>
           </div>
           <div class="project-info">
@@ -1041,10 +194,10 @@
           </div>
         </article>
 
+        <!-- Template -->
         <article class="project-card reveal" data-category="template">
-          <div class="project-visual visual-template" style="--c: #10b981;">
-            <div class="blueprint-grid"></div>
-            <div class="template-shape"></div>
+          <div class="project-visual drawing-visual">
+            <canvas class="project-model" data-model="template" aria-label="Precision production template drawing"></canvas>
             <div class="project-overlay"><span class="project-tag">Template</span></div>
           </div>
           <div class="project-info">
@@ -1054,12 +207,10 @@
           </div>
         </article>
 
+        <!-- Drawing -->
         <article class="project-card reveal" data-category="drawing">
-          <div class="project-visual visual-drawing" style="--c: #06b6d4;">
-            <div class="drawing-lines">
-              <span></span><span></span><span></span><span></span>
-              <span class="dim"></span><span class="dim"></span>
-            </div>
+          <div class="project-visual drawing-visual">
+            <canvas class="project-model" data-model="drawing" aria-label="Orthographic technical drawing"></canvas>
             <div class="project-overlay"><span class="project-tag">Technical Drawing</span></div>
           </div>
           <div class="project-info">
@@ -1069,13 +220,10 @@
           </div>
         </article>
 
+        <!-- Assembly -->
         <article class="project-card reveal" data-category="assembly">
-          <div class="project-visual visual-3d" style="--c: #8b5cf6;">
-            <div class="mini-model m2">
-              <div class="m-face"></div>
-              <div class="m-face"></div>
-              <div class="m-face"></div>
-            </div>
+          <div class="project-visual model-visual">
+            <canvas class="project-model" data-model="assembly" aria-label="Exploded mechanical assembly model"></canvas>
             <div class="project-overlay"><span class="project-tag">Assembly</span></div>
           </div>
           <div class="project-info">
@@ -1085,12 +233,10 @@
           </div>
         </article>
 
+        <!-- Drawing 2 -->
         <article class="project-card reveal" data-category="drawing">
-          <div class="project-visual visual-drawing" style="--c: #f59e0b;">
-            <div class="drawing-lines alt">
-              <span></span><span></span><span></span>
-              <span class="dim"></span><span class="dim"></span>
-            </div>
+          <div class="project-visual drawing-visual">
+            <canvas class="project-model" data-model="exploded" aria-label="Exploded assembly technical view"></canvas>
             <div class="project-overlay"><span class="project-tag">Technical Drawing</span></div>
           </div>
           <div class="project-info">
@@ -1100,10 +246,10 @@
           </div>
         </article>
 
+        <!-- Template 2 -->
         <article class="project-card reveal" data-category="template">
-          <div class="project-visual visual-template" style="--c: #ec4899;">
-            <div class="blueprint-grid"></div>
-            <div class="template-shape alt"></div>
+          <div class="project-visual drawing-visual">
+            <canvas class="project-model" data-model="nesting" aria-label="Nesting template layout"></canvas>
             <div class="project-overlay"><span class="project-tag">Template</span></div>
           </div>
           <div class="project-info">
@@ -1125,7 +271,7 @@
             </svg>
           </div>
           <h3>Add New Work</h3>
-          <p>Drag & drop images or click to browse. <span class="static-note">(Static demo — no server upload)</span></p>
+          <p>Drag & drop images or click to browse. <span class="static-note">(Local preview only — add your final project renders here)</span></p>
           <input type="file" id="fileInput" accept="image/*" multiple hidden>
           <button class="btn btn-outline" id="browseBtn">Browse Files</button>
         </div>
@@ -1190,143 +336,11 @@
           <span class="logo-mark">JN</span>
           <span>Justine Nagrampa · CAD Designer</span>
         </div>
-        <p class="footer-copy">Designed with precision. Built for clarity.</p>
+        <p class="footer-copy">Thoughtful ideas, carefully made.</p>
       </div>
     </div>
   </footer>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Navbar scroll effect
-      const navbar = document.getElementById('navbar');
-      const onScroll = () => {
-        navbar.classList.toggle('scrolled', window.scrollY > 40);
-      };
-      window.addEventListener('scroll', onScroll, { passive: true });
-      onScroll();
-
-      // Mobile nav toggle
-      const navToggle = document.getElementById('navToggle');
-      const navLinks = document.getElementById('navLinks');
-      navToggle?.addEventListener('click', () => {
-        navToggle.classList.toggle('active');
-        navLinks.classList.toggle('open');
-      });
-
-      navLinks?.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-          navToggle.classList.remove('active');
-          navLinks.classList.remove('open');
-        });
-      });
-
-      // Scroll reveal
-      const reveals = document.querySelectorAll('.reveal');
-      const revealObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('visible');
-            }
-          });
-        },
-        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
-      );
-      reveals.forEach(el => revealObserver.observe(el));
-
-      // Gallery filters
-      const filterBtns = document.querySelectorAll('.filter-btn');
-      const projectCards = document.querySelectorAll('.project-card');
-
-      filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          filterBtns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          const filter = btn.dataset.filter;
-
-          projectCards.forEach(card => {
-            const category = card.dataset.category;
-            if (filter === 'all' || category === filter) {
-              card.classList.remove('hidden');
-            } else {
-              card.classList.add('hidden');
-            }
-          });
-        });
-      });
-
-      // Upload zone (static demo)
-      const uploadZone = document.getElementById('uploadZone');
-      const fileInput = document.getElementById('fileInput');
-      const browseBtn = document.getElementById('browseBtn');
-      const uploadPreview = document.getElementById('uploadPreview');
-
-      browseBtn?.addEventListener('click', () => fileInput.click());
-
-      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        uploadZone?.addEventListener(eventName, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        });
-      });
-
-      ['dragenter', 'dragover'].forEach(eventName => {
-        uploadZone?.addEventListener(eventName, () => uploadZone.classList.add('dragover'));
-      });
-      ['dragleave', 'drop'].forEach(eventName => {
-        uploadZone?.addEventListener(eventName, () => uploadZone.classList.remove('dragover'));
-      });
-
-      uploadZone?.addEventListener('drop', (e) => {
-        handleFiles(e.dataTransfer.files);
-      });
-
-      fileInput?.addEventListener('change', () => {
-        handleFiles(fileInput.files);
-      });
-
-      function handleFiles(files) {
-        if (!files || !files.length) return;
-        [...files].forEach(file => {
-          if (!file.type.startsWith('image/')) return;
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const item = document.createElement('div');
-            item.className = 'preview-item';
-            item.innerHTML = `
-              <img src="${e.target.result}" alt="${file.name}">
-              <button class="remove" aria-label="Remove">×</button>
-            `;
-            item.querySelector('.remove').addEventListener('click', () => item.remove());
-            uploadPreview.appendChild(item);
-          };
-          reader.readAsDataURL(file);
-        });
-        fileInput.value = '';
-      }
-
-      // Contact form (mailto)
-      const contactForm = document.getElementById('contactForm');
-      contactForm?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const name = document.getElementById('name').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const message = document.getElementById('message').value.trim();
-
-        const subject = encodeURIComponent(`Portfolio Inquiry from ${name}`);
-        const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
-        window.location.href = `mailto:justine.nagrampa@example.com?subject=${subject}&body=${body}`;
-
-        const btn = contactForm.querySelector('button[type="submit"]');
-        const original = btn.textContent;
-        btn.textContent = 'Opening email…';
-        btn.disabled = true;
-        setTimeout(() => {
-          btn.textContent = original;
-          btn.disabled = false;
-        }, 2000);
-      });
-    });
-  </script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
