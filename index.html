@@ -65,21 +65,18 @@
       border: 1px solid rgba(27, 35, 51, 0.8);
     }
 
-    .glow-cyan {
-      box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
-    }
-
-    /* Pulse Crosshair for CAD HUD */
-    .cad-crosshair {
+    /* Force Explicit Viewport Dimensions for WebGL Canvases */
+    .three-canvas-container {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 240px;
       position: relative;
     }
-    .cad-crosshair::before, .cad-crosshair::after {
-      content: '';
-      position: absolute;
-      background: rgba(56, 189, 248, 0.6);
+    .three-canvas-container canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
     }
-    .cad-crosshair::before { width: 10px; height: 1px; top: 50%; left: -14px; }
-    .cad-crosshair::after { width: 1px; height: 10px; left: 50%; top: -14px; }
   </style>
 </head>
 <body class="bg-cad-bg text-slate-100 font-sans antialiased bg-cad-grid min-h-screen relative overflow-x-hidden selection:bg-sky-500 selection:text-white">
@@ -115,7 +112,7 @@
     </div>
 
     <!-- Mobile Drawer -->
-    <div id="mobileMenu" class="hidden md:hidden fixed inset-x-0 top-[73px] bg-cad-card/95 border-b border-cad-border p-6 backdrop-blur-xl flex flex-col gap-4 font-mono text-sm">
+    <div id="mobileMenu" class="hidden md:hidden fixed inset-x-0 top-[73px] bg-cad-card/95 border-b border-cad-border p-6 backdrop-blur-xl flex flex-col gap-4 font-mono text-sm z-50">
       <a href="#home" class="mobile-link text-slate-300 hover:text-sky-400">01. Robot Arm</a>
       <a href="#about" class="mobile-link text-slate-300 hover:text-sky-400">02. DFM Practice</a>
       <a href="#skills" class="mobile-link text-slate-300 hover:text-sky-400">03. Stack</a>
@@ -181,7 +178,7 @@
       <div class="lg:col-span-7 relative h-[500px] sm:h-[580px] rounded-3xl border border-cad-border glass-panel overflow-hidden group shadow-2xl">
         
         <!-- Three.js Canvas Container -->
-        <div id="heroCanvasContainer" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
+        <div id="heroCanvasContainer" class="three-canvas-container cursor-grab active:cursor-grabbing"></div>
 
         <!-- CAD Overlay HUD -->
         <div class="absolute top-4 left-4 pointer-events-none flex flex-col gap-1 font-mono text-[11px] text-sky-400 bg-cad-bg/90 backdrop-blur-md p-3.5 rounded-xl border border-sky-500/30">
@@ -194,7 +191,7 @@
         </div>
 
         <!-- Dynamic Control Bar floating bottom -->
-        <div class="absolute bottom-4 inset-x-4 flex flex-wrap items-center justify-between gap-2 p-2.5 bg-cad-card/90 border border-cad-border rounded-2xl backdrop-blur-xl font-mono text-xs">
+        <div class="absolute bottom-4 inset-x-4 flex flex-wrap items-center justify-between gap-2 p-2.5 bg-cad-card/90 border border-cad-border rounded-2xl backdrop-blur-xl font-mono text-xs z-10">
           <div class="flex items-center gap-2">
             <button id="heroExplodeBtn" class="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-sans font-medium transition-all flex items-center gap-1.5 shadow-md">
               <i data-lucide="layers" class="w-3.5 h-3.5"></i>
@@ -365,12 +362,12 @@
         <!-- Item 1: Executive Ergonomic Chair -->
         <div class="gallery-card group bg-cad-card border border-cad-border hover:border-sky-500/60 rounded-3xl overflow-hidden transition-all duration-300 cursor-pointer flex flex-col justify-between" data-category="product" data-model-id="chair">
           <div class="relative h-64 bg-cad-bg overflow-hidden">
-            <div id="cardCanvas-chair" class="w-full h-full"></div>
-            <div class="absolute top-3 left-3 bg-cad-bg/90 border border-cad-border px-2.5 py-1 rounded-lg font-mono text-[10px] text-sky-400 flex items-center gap-1.5">
+            <div id="cardCanvas-chair" class="three-canvas-container"></div>
+            <div class="absolute top-3 left-3 bg-cad-bg/90 border border-cad-border px-2.5 py-1 rounded-lg font-mono text-[10px] text-sky-400 flex items-center gap-1.5 z-10">
               <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
               <span>ERGONOMIC CHAIR</span>
             </div>
-            <div class="absolute bottom-3 right-3 bg-sky-600 text-white font-mono text-xs px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-lg">
+            <div class="absolute bottom-3 right-3 bg-sky-600 text-white font-mono text-xs px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-lg z-10">
               <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
               <span>Inspect 3D</span>
             </div>
@@ -388,12 +385,12 @@
         <!-- Item 2: Solid Wood & Steel Studio Table -->
         <div class="gallery-card group bg-cad-card border border-cad-border hover:border-sky-500/60 rounded-3xl overflow-hidden transition-all duration-300 cursor-pointer flex flex-col justify-between" data-category="product" data-model-id="table">
           <div class="relative h-64 bg-cad-bg overflow-hidden">
-            <div id="cardCanvas-table" class="w-full h-full"></div>
-            <div class="absolute top-3 left-3 bg-cad-bg/90 border border-cad-border px-2.5 py-1 rounded-lg font-mono text-[10px] text-cad-amber flex items-center gap-1.5">
+            <div id="cardCanvas-table" class="three-canvas-container"></div>
+            <div class="absolute top-3 left-3 bg-cad-bg/90 border border-cad-border px-2.5 py-1 rounded-lg font-mono text-[10px] text-cad-amber flex items-center gap-1.5 z-10">
               <span class="w-1.5 h-1.5 rounded-full bg-cad-amber animate-pulse"></span>
               <span>INDUSTRIAL DESK</span>
             </div>
-            <div class="absolute bottom-3 right-3 bg-sky-600 text-white font-mono text-xs px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-lg">
+            <div class="absolute bottom-3 right-3 bg-sky-600 text-white font-mono text-xs px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-lg z-10">
               <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
               <span>Inspect 3D</span>
             </div>
@@ -411,12 +408,12 @@
         <!-- Item 3: Flanged Hydraulic Valve -->
         <div class="gallery-card group bg-cad-card border border-cad-border hover:border-sky-500/60 rounded-3xl overflow-hidden transition-all duration-300 cursor-pointer flex flex-col justify-between" data-category="assembly" data-model-id="valve">
           <div class="relative h-64 bg-cad-bg overflow-hidden">
-            <div id="cardCanvas-valve" class="w-full h-full"></div>
-            <div class="absolute top-3 left-3 bg-cad-bg/90 border border-cad-border px-2.5 py-1 rounded-lg font-mono text-[10px] text-cad-emerald flex items-center gap-1.5">
+            <div id="cardCanvas-valve" class="three-canvas-container"></div>
+            <div class="absolute top-3 left-3 bg-cad-bg/90 border border-cad-border px-2.5 py-1 rounded-lg font-mono text-[10px] text-cad-emerald flex items-center gap-1.5 z-10">
               <span class="w-1.5 h-1.5 rounded-full bg-cad-emerald animate-pulse"></span>
               <span>HYDRAULIC VALVE</span>
             </div>
-            <div class="absolute bottom-3 right-3 bg-sky-600 text-white font-mono text-xs px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-lg">
+            <div class="absolute bottom-3 right-3 bg-sky-600 text-white font-mono text-xs px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-lg z-10">
               <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
               <span>Inspect 3D</span>
             </div>
@@ -434,12 +431,12 @@
         <!-- Item 4: Planetary Gearbox Assembly -->
         <div class="gallery-card group bg-cad-card border border-cad-border hover:border-sky-500/60 rounded-3xl overflow-hidden transition-all duration-300 cursor-pointer flex flex-col justify-between" data-category="assembly" data-model-id="planetary">
           <div class="relative h-64 bg-cad-bg overflow-hidden">
-            <div id="cardCanvas-planetary" class="w-full h-full"></div>
-            <div class="absolute top-3 left-3 bg-cad-bg/90 border border-cad-border px-2.5 py-1 rounded-lg font-mono text-[10px] text-purple-400 flex items-center gap-1.5">
+            <div id="cardCanvas-planetary" class="three-canvas-container"></div>
+            <div class="absolute top-3 left-3 bg-cad-bg/90 border border-cad-border px-2.5 py-1 rounded-lg font-mono text-[10px] text-purple-400 flex items-center gap-1.5 z-10">
               <span class="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse"></span>
               <span>GEAR KINEMATICS</span>
             </div>
-            <div class="absolute bottom-3 right-3 bg-sky-600 text-white font-mono text-xs px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-lg">
+            <div class="absolute bottom-3 right-3 bg-sky-600 text-white font-mono text-xs px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-lg z-10">
               <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
               <span>Inspect 3D</span>
             </div>
@@ -457,12 +454,12 @@
         <!-- Item 5: Engine Piston & Connecting Rod -->
         <div class="gallery-card group bg-cad-card border border-cad-border hover:border-sky-500/60 rounded-3xl overflow-hidden transition-all duration-300 cursor-pointer flex flex-col justify-between" data-category="assembly" data-model-id="piston">
           <div class="relative h-64 bg-cad-bg overflow-hidden">
-            <div id="cardCanvas-piston" class="w-full h-full"></div>
-            <div class="absolute top-3 left-3 bg-cad-bg/90 border border-cad-border px-2.5 py-1 rounded-lg font-mono text-[10px] text-cad-rose flex items-center gap-1.5">
+            <div id="cardCanvas-piston" class="three-canvas-container"></div>
+            <div class="absolute top-3 left-3 bg-cad-bg/90 border border-cad-border px-2.5 py-1 rounded-lg font-mono text-[10px] text-cad-rose flex items-center gap-1.5 z-10">
               <span class="w-1.5 h-1.5 rounded-full bg-cad-rose animate-pulse"></span>
               <span>ENGINE MECHANISM</span>
             </div>
-            <div class="absolute bottom-3 right-3 bg-sky-600 text-white font-mono text-xs px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-lg">
+            <div class="absolute bottom-3 right-3 bg-sky-600 text-white font-mono text-xs px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-lg z-10">
               <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
               <span>Inspect 3D</span>
             </div>
@@ -480,12 +477,12 @@
         <!-- Item 6: Precision Sheet Metal Enclosure -->
         <div class="gallery-card group bg-cad-card border border-cad-border hover:border-sky-500/60 rounded-3xl overflow-hidden transition-all duration-300 cursor-pointer flex flex-col justify-between" data-category="template" data-model-id="bracket">
           <div class="relative h-64 bg-cad-bg overflow-hidden">
-            <div id="cardCanvas-bracket" class="w-full h-full"></div>
-            <div class="absolute top-3 left-3 bg-cad-bg/90 border border-cad-border px-2.5 py-1 rounded-lg font-mono text-[10px] text-sky-300 flex items-center gap-1.5">
+            <div id="cardCanvas-bracket" class="three-canvas-container"></div>
+            <div class="absolute top-3 left-3 bg-cad-bg/90 border border-cad-border px-2.5 py-1 rounded-lg font-mono text-[10px] text-sky-300 flex items-center gap-1.5 z-10">
               <span class="w-1.5 h-1.5 rounded-full bg-sky-300 animate-pulse"></span>
               <span>SHEET METAL HOUSING</span>
             </div>
-            <div class="absolute bottom-3 right-3 bg-sky-600 text-white font-mono text-xs px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-lg">
+            <div class="absolute bottom-3 right-3 bg-sky-600 text-white font-mono text-xs px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-lg z-10">
               <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
               <span>Inspect 3D</span>
             </div>
@@ -636,10 +633,10 @@
       
       <!-- 3D Viewer Canvas -->
       <div class="lg:col-span-9 relative h-full bg-slate-950 cursor-grab active:cursor-grabbing overflow-hidden">
-        <div id="modalCanvasContainer" class="w-full h-full"></div>
+        <div id="modalCanvasContainer" class="three-canvas-container"></div>
 
         <!-- CAD Viewer HUD Badge -->
-        <div class="absolute top-4 left-4 bg-cad-card/90 border border-cad-border backdrop-blur-md p-3.5 rounded-xl font-mono text-xs space-y-1">
+        <div class="absolute top-4 left-4 bg-cad-card/90 border border-cad-border backdrop-blur-md p-3.5 rounded-xl font-mono text-xs space-y-1 pointer-events-none z-10">
           <div class="text-sky-400 font-bold flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
             <span>SOLVER STATUS: ACTIVE</span>
@@ -648,7 +645,7 @@
         </div>
 
         <!-- FEA Heatmap Stress Legend -->
-        <div id="feaLegend" class="hidden absolute top-4 right-4 bg-cad-card/95 border border-cad-border p-3.5 rounded-xl font-mono text-xs space-y-2">
+        <div id="feaLegend" class="hidden absolute top-4 right-4 bg-cad-card/95 border border-cad-border p-3.5 rounded-xl font-mono text-xs space-y-2 pointer-events-none z-10">
           <span class="text-slate-200 font-bold block text-[11px]">von Mises Stress (MPa)</span>
           <div class="w-36 h-4 rounded bg-gradient-to-r from-blue-600 via-green-400 via-yellow-400 to-red-600"></div>
           <div class="flex justify-between text-[10px] text-slate-400">
@@ -659,7 +656,7 @@
         </div>
 
         <!-- Bottom Viewer Controls -->
-        <div class="absolute bottom-6 inset-x-6 flex flex-wrap items-center justify-between gap-3 bg-cad-card/90 border border-cad-border p-3 rounded-2xl backdrop-blur-xl font-mono text-xs">
+        <div class="absolute bottom-6 inset-x-6 flex flex-wrap items-center justify-between gap-3 bg-cad-card/90 border border-cad-border p-3 rounded-2xl backdrop-blur-xl font-mono text-xs z-10">
           <div class="flex flex-wrap items-center gap-2">
             <span class="text-slate-400 text-[10px] hidden sm:inline">RENDER MODE:</span>
             <button id="modeMaterialBtn" class="px-3 py-1.5 rounded-xl bg-sky-600 text-white font-medium">PBR Realistic</button>
@@ -745,10 +742,12 @@
   </div>
 
 
-  <!-- PROCEDURAL 3D GEOMETRY GENERATORS & THREE.JS LOGIC -->
+  <!-- PROCEDURAL 3D GEOMETRY GENERATORS & THREE.JS ENGINE -->
   <script>
     // Initialize Lucide Icons
-    lucide.createIcons();
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+    });
 
     /* =========================================================
        PROCEDURAL THREE.JS MESH CREATION HELPERS FOR REAL ITEMS
@@ -757,188 +756,181 @@
     // 1. Executive Ergonomic Task Chair
     function buildChairMesh() {
       const chairGroup = new THREE.Group();
-      const chromeMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.95, roughness: 0.1 });
-      const blackPlastic = new THREE.MeshStandardMaterial({ color: 0x111622, roughness: 0.6 });
-      const cushionMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 });
+      const chromeMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.9, roughness: 0.15 });
+      const blackPlastic = new THREE.MeshStandardMaterial({ color: 0x18202e, roughness: 0.5 });
+      const cushionMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.6 });
 
-      // 5-Star Caster Base
-      const baseHub = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.2, 16), chromeMat);
-      baseHub.position.y = -1.2;
+      // Base Hub
+      const baseHub = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.15, 16), chromeMat);
+      baseHub.position.y = -0.8;
       chairGroup.add(baseHub);
 
+      // Legs
       for (let i = 0; i < 5; i++) {
         const angle = (i * Math.PI * 2) / 5;
-        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 1.1), chromeMat);
-        leg.position.set(Math.sin(angle) * 0.55, -1.2, Math.cos(angle) * 0.55);
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.08, 0.9), chromeMat);
+        leg.position.set(Math.sin(angle) * 0.45, -0.8, Math.cos(angle) * 0.45);
         leg.rotation.y = angle;
         chairGroup.add(leg);
 
         const caster = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), blackPlastic);
-        caster.position.set(Math.sin(angle) * 1.0, -1.28, Math.cos(angle) * 1.0);
+        caster.position.set(Math.sin(angle) * 0.85, -0.85, Math.cos(angle) * 0.85);
         chairGroup.add(caster);
       }
 
-      // Gas Lift Cylinder
-      const gasLift = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.8, 16), chromeMat);
-      gasLift.position.y = -0.7;
+      // Gas Lift
+      const gasLift = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.6, 16), chromeMat);
+      gasLift.position.y = -0.45;
       chairGroup.add(gasLift);
 
       // Seat Cushion
-      const seat = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.15, 1.2), cushionMat);
-      seat.position.y = -0.2;
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.12, 1.0), cushionMat);
+      seat.position.y = -0.1;
       chairGroup.add(seat);
 
       // Backrest Frame
-      const back = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.3, 0.1), cushionMat);
-      back.position.set(0, 0.5, -0.55);
-      back.rotation.x = -0.1;
+      const back = new THREE.Mesh(new THREE.BoxGeometry(0.95, 1.1, 0.1), cushionMat);
+      back.position.set(0, 0.5, -0.45);
+      back.rotation.x = -0.08;
       chairGroup.add(back);
 
       // Armrests
-      for (let x of [-0.65, 0.65]) {
-        const armPost = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.5, 12), blackPlastic);
-        armPost.position.set(x, 0.1, -0.1);
-        const armPad = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.06, 0.6), blackPlastic);
+      for (let x of [-0.58, 0.58]) {
+        const armPost = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.4, 12), blackPlastic);
+        armPost.position.set(x, 0.15, -0.05);
+        const armPad = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.05, 0.5), blackPlastic);
         armPad.position.set(x, 0.35, -0.05);
         chairGroup.add(armPost);
         chairGroup.add(armPad);
       }
 
+      chairGroup.scale.set(1.4, 1.4, 1.4);
       return chairGroup;
     }
 
     // 2. Industrial Wood & Steel Table
     function buildTableMesh() {
       const tableGroup = new THREE.Group();
-      const woodMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.5 });
-      const steelMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, metalness: 0.8, roughness: 0.3 });
+      const woodMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.4 });
+      const steelMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.2 });
 
       // Table Top Slab
-      const top = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.12, 1.4), woodMat);
-      top.position.y = 0.6;
+      const top = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.1, 1.2), woodMat);
+      top.position.y = 0.5;
       tableGroup.add(top);
 
       // Welded Steel Legs
-      for (let x of [-1.0, 1.0]) {
-        for (let z of [-0.5, 0.5]) {
-          const leg = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.2, 0.1), steelMat);
+      for (let x of [-0.9, 0.9]) {
+        for (let z of [-0.45, 0.45]) {
+          const leg = new THREE.Mesh(new THREE.BoxGeometry(0.08, 1.0, 0.08), steelMat);
           leg.position.set(x, 0, z);
           tableGroup.add(leg);
 
-          // Leveling feet
-          const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.06, 12), steelMat);
-          foot.position.set(x, -0.62, z);
+          const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.05, 12), steelMat);
+          foot.position.set(x, -0.52, z);
           tableGroup.add(foot);
         }
 
-        // Cross Braces
-        const brace = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 1.0), steelMat);
-        brace.position.set(x, -0.3, 0);
+        const brace = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.9), steelMat);
+        brace.position.set(x, -0.2, 0);
         tableGroup.add(brace);
       }
 
+      tableGroup.scale.set(1.2, 1.2, 1.2);
       return tableGroup;
     }
 
     // 3. High-Pressure Flanged Hydraulic Valve
     function buildValveMesh() {
       const valveGroup = new THREE.Group();
-      const castIron = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.3 });
-      const brassMat = new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.9, roughness: 0.2 });
+      const castIron = new THREE.MeshStandardMaterial({ color: 0x0284c7, metalness: 0.7, roughness: 0.3 });
+      const brassMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.9, roughness: 0.2 });
 
-      // Main Valve Body Chamber
-      const body = new THREE.Mesh(new THREE.SphereGeometry(0.65, 24, 24), castIron);
+      const body = new THREE.Mesh(new THREE.SphereGeometry(0.55, 24, 24), castIron);
       valveGroup.add(body);
 
-      // Flanged Pipes Left & Right
-      for (let x of [-0.9, 0.9]) {
-        const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.6, 20), castIron);
+      for (let x of [-0.7, 0.7]) {
+        const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.5, 20), castIron);
         pipe.rotation.z = Math.PI / 2;
         pipe.position.x = x * 0.5;
         valveGroup.add(pipe);
 
-        const flange = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.12, 24), castIron);
+        const flange = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.1, 24), castIron);
         flange.rotation.z = Math.PI / 2;
         flange.position.x = x;
         valveGroup.add(flange);
       }
 
-      // Valve Bonnet & Stem
-      const bonnet = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.8, 20), castIron);
-      bonnet.position.y = 0.7;
+      const bonnet = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.6, 20), castIron);
+      bonnet.position.y = 0.55;
       valveGroup.add(bonnet);
 
-      const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.8, 16), brassMat);
-      stem.position.y = 1.1;
+      const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.7, 16), brassMat);
+      stem.position.y = 0.9;
       valveGroup.add(stem);
 
-      // Handwheel
-      const wheelRing = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.06, 12, 24), brassMat);
+      const wheelRing = new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.05, 12, 24), brassMat);
       wheelRing.rotation.x = Math.PI / 2;
-      wheelRing.position.y = 1.5;
+      wheelRing.position.y = 1.25;
       valveGroup.add(wheelRing);
 
+      valveGroup.scale.set(1.3, 1.3, 1.3);
       return valveGroup;
     }
 
     // 4. Multi-Stage Planetary Gearbox
     function buildPlanetaryMesh() {
       const group = new THREE.Group();
-      const steelMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.9, roughness: 0.2 });
-      const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.8, roughness: 0.2 });
+      const steelMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9, roughness: 0.2 });
+      const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.85, roughness: 0.2 });
 
-      // Outer Ring Gear Casing
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(1.2, 0.15, 16, 32), steelMat);
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(1.0, 0.12, 16, 32), steelMat);
       ring.rotation.x = Math.PI / 2;
       group.add(ring);
 
-      // Central Sun Gear
-      const sun = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.3, 24), goldMat);
+      const sun = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.25, 24), goldMat);
       group.add(sun);
 
-      // 3 Planet Gears
       group.planets = [];
       for (let i = 0; i < 3; i++) {
-        const planet = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.3, 20), steelMat);
+        const planet = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.25, 20), steelMat);
         const angle = (i * Math.PI * 2) / 3;
-        planet.position.set(Math.cos(angle) * 0.75, 0, Math.sin(angle) * 0.75);
+        planet.position.set(Math.cos(angle) * 0.65, 0, Math.sin(angle) * 0.65);
         group.add(planet);
         group.planets.push(planet);
       }
 
+      group.scale.set(1.4, 1.4, 1.4);
       return group;
     }
 
     // 5. Engine Piston & Connecting Rod
     function buildPistonMesh() {
       const group = new THREE.Group();
-      const alumMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9, roughness: 0.15 });
+      const alumMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.2 });
       const steelMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8, roughness: 0.3 });
 
-      // Piston Crown
-      const crown = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.75, 0.8, 32), alumMat);
-      crown.position.y = 0.8;
+      const crown = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.65, 0.7, 32), alumMat);
+      crown.position.y = 0.6;
       group.add(crown);
 
-      // Compression Ring Grooves
-      for (let y of [0.95, 1.05, 1.15]) {
-        const ring = new THREE.Mesh(new THREE.TorusGeometry(0.76, 0.02, 8, 32), steelMat);
+      for (let y of [0.75, 0.85, 0.95]) {
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(0.66, 0.018, 8, 32), steelMat);
         ring.rotation.x = Math.PI / 2;
         ring.position.y = y - 0.2;
         group.add(ring);
       }
 
-      // Wrist Pin
-      const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 1.2, 16), steelMat);
+      const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 1.0, 16), steelMat);
       pin.rotation.z = Math.PI / 2;
-      pin.position.y = 0.6;
+      pin.position.y = 0.45;
       group.add(pin);
 
-      // Connecting Rod
-      const rod = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.4, 0.15), steelMat);
+      const rod = new THREE.Mesh(new THREE.BoxGeometry(0.16, 1.1, 0.12), steelMat);
       rod.position.y = -0.2;
       group.add(rod);
 
-      // Split Rod Cap
-      const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.25, 20), steelMat);
-      cap
+      const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.2, 20), steelMat);
+      cap.rotation.x = Math.PI / 2;
+      cap.position.y = -0.75;
+      group
