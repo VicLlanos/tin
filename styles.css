@@ -905,13 +905,18 @@ img { max-width: 100%; display: block; }
 .footer-copy { font-size: 0.85rem; color: var(--text-dim); }
 
 /* Reveal animations */
+/* Content stays visible by default. Scroll reveals are progressive enhancement only. */
 .reveal {
-  opacity: 0;
-  transform: translateY(28px);
+  opacity: 1;
+  transform: none;
   transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.reveal.visible {
+.js-enabled .reveal {
+  opacity: 0;
+  transform: translateY(28px);
+}
+.js-enabled .reveal.visible {
   opacity: 1;
   transform: translateY(0);
 }

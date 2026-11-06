@@ -11,3 +11,7 @@ The hero contains an interactive mesh-based precision bench vise assembly. Galle
 
 ## Before publishing
 Replace placeholder contact details and illustrative project examples with the portfolio owner's real contact information, project renders and verified project descriptions. The upload area is a local browser preview only; it does not upload or persist files.
+
+
+## GitHub Pages deployment
+Upload/replace all three files (`index.html`, `styles.css`, and `script.js`) in the same published folder. The import map in `index.html` resolves Three.js example-module imports correctly on GitHub Pages. The content also remains visible if the 3D CDN is temporarily unavailable.

@@ -1,5 +1,5 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -135,4 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const body=encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
     location.href=`mailto:justine.nagrampa@example.com?subject=${subject}&body=${body}`;
   });
+  // Progressive enhancement: keep the page readable if JavaScript or the 3D CDN fails.
+  document.body.classList.add('js-enabled');
 });
