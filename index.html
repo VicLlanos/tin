@@ -44,9 +44,7 @@
         <li><a href="#home">Home</a></li>
         <li><a href="#about">About</a></li>
         <li><a href="#skills">Skills</a></li>
-        <li><a href="#experience">Experience</a></li>
         <li><a href="#work">Work</a></li>
-        <li><a href="#certs">Certs</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
       <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
@@ -177,23 +175,11 @@
     </div>
   </section>
 
-  <!-- Experience (revision history, managed from the admin panel) -->
-  <section class="section experience" id="experience">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="section-label">03 — Experience</span>
-        <h2>Revision history</h2>
-        <p class="section-desc">Where the work has happened — newest revision first.</p>
-      </div>
-      <div class="rev-table" id="expList"></div>
-    </div>
-  </section>
-
   <!-- Work / Gallery -->
   <section class="section work" id="work">
     <div class="container">
       <div class="section-header reveal">
-        <span class="section-label">04 — Selected Work</span>
+        <span class="section-label">03 — Selected Work</span>
         <h2>Project gallery</h2>
         <p class="section-desc">A closer look at product thinking, CAD modeling, and the details that make ideas buildable. Click any card to explore the model and read the full story.</p>
       </div>
@@ -208,7 +194,7 @@
 
       <div class="gallery" id="gallery">
         <!-- Product -->
-        <article class="project-card reveal sample" data-category="product" data-project="housing">
+        <article class="project-card reveal" data-category="product" data-project="housing">
           <div class="project-visual model-visual">
             <canvas class="project-model" data-model="housing" aria-label="3D product housing model"></canvas>
             <div class="project-overlay"><span class="project-tag">Product Design</span></div>
@@ -221,7 +207,7 @@
         </article>
 
         <!-- Template -->
-        <article class="project-card reveal sample" data-category="template" data-project="template">
+        <article class="project-card reveal" data-category="template" data-project="template">
           <div class="project-visual drawing-visual">
             <canvas class="project-model" data-model="template" aria-label="Precision production template drawing"></canvas>
             <div class="project-overlay"><span class="project-tag">Template</span></div>
@@ -234,7 +220,7 @@
         </article>
 
         <!-- Drawing -->
-        <article class="project-card reveal sample" data-category="drawing" data-project="drawing">
+        <article class="project-card reveal" data-category="drawing" data-project="drawing">
           <div class="project-visual drawing-visual">
             <canvas class="project-model" data-model="drawing" aria-label="Orthographic technical drawing"></canvas>
             <div class="project-overlay"><span class="project-tag">Technical Drawing</span></div>
@@ -247,7 +233,7 @@
         </article>
 
         <!-- Assembly -->
-        <article class="project-card reveal sample" data-category="assembly" data-project="assembly">
+        <article class="project-card reveal" data-category="assembly" data-project="assembly">
           <div class="project-visual model-visual">
             <canvas class="project-model" data-model="assembly" aria-label="Exploded mechanical assembly model"></canvas>
             <div class="project-overlay"><span class="project-tag">Assembly</span></div>
@@ -260,7 +246,7 @@
         </article>
 
         <!-- Drawing 2 -->
-        <article class="project-card reveal sample" data-category="drawing" data-project="exploded">
+        <article class="project-card reveal" data-category="drawing" data-project="exploded">
           <div class="project-visual drawing-visual">
             <canvas class="project-model" data-model="exploded" aria-label="Exploded assembly technical view"></canvas>
             <div class="project-overlay"><span class="project-tag">Technical Drawing</span></div>
@@ -273,7 +259,7 @@
         </article>
 
         <!-- Template 2 -->
-        <article class="project-card reveal sample" data-category="template" data-project="nesting">
+        <article class="project-card reveal" data-category="template" data-project="nesting">
           <div class="project-visual drawing-visual">
             <canvas class="project-model" data-model="nesting" aria-label="Nesting template layout"></canvas>
             <div class="project-overlay"><span class="project-tag">Template</span></div>
@@ -285,17 +271,24 @@
           </div>
         </article>
       </div>
-    </div>
-  </section>
 
-  <!-- Certifications (managed from the admin panel) -->
-  <section class="section certs" id="certs">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="section-label">05 — Certifications</span>
-        <h2>Approvals &amp; credentials</h2>
+      <!-- Upload zone -->
+      <div class="upload-zone reveal" id="uploadZone">
+        <div class="upload-inner">
+          <div class="upload-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <h3>Add New Work</h3>
+          <p>Drag & drop images or click to browse. <span class="static-note">(Local preview only — add your final project renders here)</span></p>
+          <input type="file" id="fileInput" accept="image/*" multiple hidden>
+          <button class="btn btn-outline" id="browseBtn">Browse Files</button>
+        </div>
+        <div class="upload-preview" id="uploadPreview"></div>
       </div>
-      <div class="cert-grid" id="certList"></div>
     </div>
   </section>
 
@@ -303,7 +296,7 @@
   <section class="section contact" id="contact">
     <div class="container">
       <div class="section-header reveal">
-        <span class="section-label">06 — Contact</span>
+        <span class="section-label">04 — Contact</span>
         <h2>Let’s build something precise</h2>
       </div>
       <div class="contact-grid">
@@ -350,16 +343,12 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="container">
-      <div class="title-block" aria-hidden="true">
-        <div><small>DRAWN BY</small>J. NAGRAMPA</div><div class="wide"><small>TITLE</small>PORTFOLIO — CAD DESIGNER</div>
-        <div><small>SCALE</small>1:1</div><div><small>REV</small>A</div><div><small>UNITS</small>MM</div>
-      </div>
       <div class="footer-inner">
         <div class="footer-brand">
           <span class="logo-mark">JN</span>
           <span>Justine Nagrampa · CAD Designer</span>
         </div>
-        <p class="footer-copy">Thoughtful ideas, carefully made. · <a href="#" id="adminLink" class="admin-link">Admin</a></p>
+        <p class="footer-copy">Thoughtful ideas, carefully made.</p>
       </div>
     </div>
   </footer>
@@ -372,10 +361,6 @@
       <div class="project-modal-content">
         <div class="project-modal-viewer">
           <div class="modal-viewer-label">ISOMETRIC VIEW · DRAG TO ORBIT</div>
-          <img id="modalCover" alt="" hidden>
-          <div class="modal-load" id="modalLoad" hidden><i></i><span>LOADING MODEL…</span></div>
-          <div class="viewer-tools" id="viewerTools" hidden><button data-v="wire">Wire</button><button data-v="box">Box</button><button data-v="spin" class="on">Spin</button><button data-v="reset">Reset</button></div>
-          <div class="viewer-dims" id="viewerDims" hidden></div>
           <canvas id="modalModel" aria-label="Interactive isometric 3D model of the selected project"></canvas>
         </div>
         <div class="project-modal-details">
