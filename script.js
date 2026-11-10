@@ -1,51 +1,82 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { getDatabase, ref, onValue, set, push, remove, update } from 'firebase/database';
+import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+
+/* ============================================================
+   FIREBASE
+   ============================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyD6f6xMhYF6lqKp7cqmeywqarL-_yRbm9E",
+  authDomain: "tine-54a9e.firebaseapp.com",
+  databaseURL: "https://tine-54a9e-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "tine-54a9e",
+  storageBucket: "tine-54a9e.firebasestorage.app",
+  messagingSenderId: "898265691586",
+  appId: "1:898265691586:web:d9684a5a401c32cf3a125b",
+  measurementId: "G-9L1YCGEJQK"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const storage = getStorage(app);
 
 document.addEventListener('DOMContentLoaded', () => {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 
+  /* ---------- NAV ---------- */
   const navbar = $('#navbar'), navToggle = $('#navToggle'), navLinks = $('#navLinks');
   const scroll = () => navbar?.classList.toggle('scrolled', scrollY > 40);
-  addEventListener('scroll', scroll, { passive: true }); scroll();
+  addEventListener('scroll', scroll, { passive: true });
+  scroll();
   navToggle?.addEventListener('click', () => {
-    navToggle.classList.toggle('active'); navLinks.classList.toggle('open');
-    navToggle.setAttribute('aria-expanded', String(navToggle.classList.contains('active')));
+    navToggle.classList.toggle('active');
+    navLinks.classList.toggle('open');
   });
   $$('#navLinks a').forEach(a => a.addEventListener('click', () => {
-    navToggle.classList.remove('active'); navLinks.classList.remove('open');
-    navToggle.setAttribute('aria-expanded', 'false');
+    navToggle.classList.remove('active');
+    navLinks.classList.remove('open');
   }));
 
+  /* ---------- REVEAL ---------- */
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver(entries => entries.forEach(e => {
       if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
-    }), { threshold: .1, rootMargin: '0px 0px -30px 0px' });
+    }), { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
     $$('.reveal').forEach(el => io.observe(el));
-  } else $$('.reveal').forEach(el => el.classList.add('visible'));
+  } else {
+    $$('.reveal').forEach(el => el.classList.add('visible'));
+  }
 
+  /* ---------- FILTERS ---------- */
   $$('.filter-btn').forEach(btn => btn.addEventListener('click', () => {
     $$('.filter-btn').forEach(b => b.classList.toggle('active', b === btn));
-    $$('.project-card').forEach(card => card.classList.toggle('hidden',
-      btn.dataset.filter !== 'all' && card.dataset.category !== btn.dataset.filter));
+    $$('.project-card').forEach(card => {
+      const cat = card.dataset.category || '';
+      card.classList.toggle('hidden', btn.dataset.filter !== 'all' && cat !== btn.dataset.filter);
+    });
   }));
 
   /* ============================================================
-     MATERIALS
+     MATERIALS (black & white technical palette)
      ============================================================ */
   const M = {
-    cast:    new THREE.MeshStandardMaterial({ color: '#55738c', metalness: .68, roughness: .32 }),
-    dark:    new THREE.MeshStandardMaterial({ color: '#263d52', metalness: .7,  roughness: .34 }),
-    steel:   new THREE.MeshStandardMaterial({ color: '#b9c9d7', metalness: .9,  roughness: .22 }),
-    gold:    new THREE.MeshStandardMaterial({ color: '#d99c52', metalness: .7,  roughness: .28 }),
-    rubber:  new THREE.MeshStandardMaterial({ color: '#17232e', roughness: .82 }),
-    blue:    new THREE.MeshStandardMaterial({ color: '#8fb7d5', metalness: .6,  roughness: .3 }),
-    green:   new THREE.MeshStandardMaterial({ color: '#4fae7a', metalness: .5,  roughness: .4 }),
-    copper:  new THREE.MeshStandardMaterial({ color: '#b87333', metalness: .85, roughness: .25 }),
-    white:   new THREE.MeshStandardMaterial({ color: '#e8eef4', metalness: .3,  roughness: .45 }),
-    orange:  new THREE.MeshStandardMaterial({ color: '#e08a3c', metalness: .55, roughness: .35 }),
-    glass:   new THREE.MeshStandardMaterial({ color: '#9fd0ff', metalness: .1,  roughness: .15, transparent: true, opacity: .45 }),
+    cast:   new THREE.MeshStandardMaterial({ color: '#4a4a4a', metalness: 0.55, roughness: 0.4 }),
+    dark:   new THREE.MeshStandardMaterial({ color: '#2a2a2a', metalness: 0.6,  roughness: 0.45 }),
+    steel:  new THREE.MeshStandardMaterial({ color: '#c8c8c8', metalness: 0.9,  roughness: 0.2 }),
+    gold:   new THREE.MeshStandardMaterial({ color: '#a0a0a0', metalness: 0.7,  roughness: 0.3 }),
+    rubber: new THREE.MeshStandardMaterial({ color: '#1a1a1a', roughness: 0.85 }),
+    blue:   new THREE.MeshStandardMaterial({ color: '#8a8a8a', metalness: 0.5,  roughness: 0.35 }),
+    green:  new THREE.MeshStandardMaterial({ color: '#6a6a6a', metalness: 0.4,  roughness: 0.45 }),
+    copper: new THREE.MeshStandardMaterial({ color: '#9a9a9a', metalness: 0.8,  roughness: 0.28 }),
+    white:  new THREE.MeshStandardMaterial({ color: '#e8e8e8', metalness: 0.2,  roughness: 0.5 }),
+    orange: new THREE.MeshStandardMaterial({ color: '#7a7a7a', metalness: 0.5,  roughness: 0.4 }),
   };
 
   /* ============================================================
@@ -63,229 +94,184 @@ document.addEventListener('DOMContentLoaded', () => {
     const o = new THREE.Mesh(new THREE.TorusGeometry(r, tube, 8, n), m);
     o.position.set(...p); o.rotation.set(...rot); o.castShadow = o.receiveShadow = true; g.add(o); return o;
   }
-  function bolt(g, p, r = .06) { cyl(g, r, r, .035, p, M.steel, 8, [Math.PI / 2, 0, 0]); }
+  function bolt(g, p, r = 0.06) {
+    cyl(g, r, r, 0.035, p, M.steel, 8, [Math.PI / 2, 0, 0]);
+  }
 
   /* ============================================================
-     MODELS
+     PROCEDURAL MODELS (fallback when no GLB)
      ============================================================ */
-
-  // ---- Precision Bench Vise (hero + assembly) ----
   function vise(g, exploded = false) {
-    box(g, [2.65, .28, 1.65], [0, -.82, 0], M.cast);
-    box(g, [2.35, .12, 1.42], [0, -.63, 0], M.dark);
-    cyl(g, .82, .82, .18, [0, -.48, 0], M.steel, 64);
-    cyl(g, .69, .69, .12, [0, -.35, 0], M.cast, 64);
-    for (const x of [-1, 1]) for (const z of [-.55, .55]) {
-      cyl(g, .18, .18, .16, [x * 1.02, -.83, z], M.dark);
-      cyl(g, .075, .075, .02, [x * 1.02, -.73, z], M.rubber);
+    box(g, [2.65, 0.28, 1.65], [0, -0.82, 0], M.cast);
+    box(g, [2.35, 0.12, 1.42], [0, -0.63, 0], M.dark);
+    cyl(g, 0.82, 0.82, 0.18, [0, -0.48, 0], M.steel, 64);
+    cyl(g, 0.69, 0.69, 0.12, [0, -0.35, 0], M.cast, 64);
+    for (const x of [-1, 1]) for (const z of [-0.55, 0.55]) {
+      cyl(g, 0.18, 0.18, 0.16, [x * 1.02, -0.83, z], M.dark);
+      cyl(g, 0.075, 0.075, 0.02, [x * 1.02, -0.73, z], M.rubber);
     }
-    box(g, [.62, 1.35, .72], [-.72, .25, 0], M.cast);
-    box(g, [.86, .24, 1.03], [-.72, .99, 0], M.dark);
-    box(g, [.08, .86, .82], [-.24, .99, 0], M.steel);
-    for (let i = 0; i < 7; i++) box(g, [.025, .035, .82], [-.19, .62 + i * .12, 0], M.dark);
-    const shift = exploded ? .5 : .16;
-    box(g, [.75, .92, .86], [.53 + shift, .82, 0], M.cast);
-    box(g, [.09, .78, .82], [.94 + shift, .88, 0], M.gold);
-    for (let i = 0; i < 6; i++) box(g, [.02, .035, .82], [.995 + shift, .57 + i * .12, 0], M.dark);
-    box(g, [1.9, .22, .26], [.18, -.1, 0], M.dark);
-    box(g, [1.9, .22, .26], [.18, .08, 0], M.blue);
-    cyl(g, .105, .105, 2.25, [.18, -.38, 0], M.steel, 32, [0, 0, Math.PI / 2]);
+    box(g, [0.62, 1.35, 0.72], [-0.72, 0.25, 0], M.cast);
+    box(g, [0.86, 0.24, 1.03], [-0.72, 0.99, 0], M.dark);
+    box(g, [0.08, 0.86, 0.82], [-0.24, 0.99, 0], M.steel);
+    for (let i = 0; i < 7; i++) box(g, [0.025, 0.035, 0.82], [-0.19, 0.62 + i * 0.12, 0], M.dark);
+    const shift = exploded ? 0.5 : 0.16;
+    box(g, [0.75, 0.92, 0.86], [0.53 + shift, 0.82, 0], M.cast);
+    box(g, [0.09, 0.78, 0.82], [0.94 + shift, 0.88, 0], M.gold);
+    for (let i = 0; i < 6; i++) box(g, [0.02, 0.035, 0.82], [0.995 + shift, 0.57 + i * 0.12, 0], M.dark);
+    box(g, [1.9, 0.22, 0.26], [0.18, -0.1, 0], M.dark);
+    box(g, [1.9, 0.22, 0.26], [0.18, 0.08, 0], M.blue);
+    cyl(g, 0.105, 0.105, 2.25, [0.18, -0.38, 0], M.steel, 32, [0, 0, Math.PI / 2]);
     for (let i = 0; i < 17; i++) {
-      const t = new THREE.Mesh(new THREE.TorusGeometry(.115, .016, 6, 24), M.gold);
-      t.rotation.y = Math.PI / 2; t.position.set(-.88 + i * .13, -.38, 0); g.add(t);
+      const t = new THREE.Mesh(new THREE.TorusGeometry(0.115, 0.016, 6, 24), M.gold);
+      t.rotation.y = Math.PI / 2;
+      t.position.set(-0.88 + i * 0.13, -0.38, 0);
+      g.add(t);
     }
-    cyl(g, .23, .23, .18, [1.35, -.38, 0], M.dark, 40, [0, 0, Math.PI / 2]);
-    cyl(g, .13, .13, .22, [1.48, -.38, 0], M.steel, 32, [0, 0, Math.PI / 2]);
-    cyl(g, .065, .065, 1.18, [1.63, -.38, 0], M.steel, 24, [0, 0, Math.PI / 2]);
-    for (const z of [-.53, .53]) cyl(g, .105, .105, .22, [1.63, -.38, z], M.rubber, 32, [0, 0, Math.PI / 2]);
-    for (const x of [-.95, -.49]) for (const z of [-.32, .32]) bolt(g, [x, 1, z], .055);
-    for (const side of [-1, 1]) { const rib = box(g, [.12, .78, .12], [-.72 + side * .31, .2, side * .37], M.dark); rib.rotation.z = side * .13; }
+    cyl(g, 0.23, 0.23, 0.18, [1.35, -0.38, 0], M.dark, 40, [0, 0, Math.PI / 2]);
+    cyl(g, 0.13, 0.13, 0.22, [1.48, -0.38, 0], M.steel, 32, [0, 0, Math.PI / 2]);
+    cyl(g, 0.065, 0.065, 1.18, [1.63, -0.38, 0], M.steel, 24, [0, 0, Math.PI / 2]);
+    for (const z of [-0.53, 0.53]) cyl(g, 0.105, 0.105, 0.22, [1.63, -0.38, z], M.rubber, 32, [0, 0, Math.PI / 2]);
+    for (const x of [-0.95, -0.49]) for (const z of [-0.32, 0.32]) bolt(g, [x, 1, z], 0.055);
+    for (const side of [-1, 1]) {
+      const rib = box(g, [0.12, 0.78, 0.12], [-0.72 + side * 0.31, 0.2, side * 0.37], M.dark);
+      rib.rotation.z = side * 0.13;
+    }
   }
 
-  // ---- Packing Component Set (product housing) ----
   function housing(g) {
-    // Main box body
     box(g, [2.5, 1.25, 1.65], [0, 0, 0], M.cast);
-    // Top plate
-    box(g, [2.32, .12, 1.48], [0, .68, 0], M.steel);
-    // Recessed lid
-    box(g, [2.05, .05, 1.22], [0, .77, 0], M.dark);
-    // Ventilation slots
-    for (let i = 0; i < 9; i++) box(g, [.045, .035, .7], [-.78 + i * .195, .81, 0], M.blue);
-    // Corner bolts
-    for (const x of [-.92, .92]) for (const z of [-.55, .55]) bolt(g, [x, .79, z]);
-    // Side connector block
-    box(g, [.14, .45, .5], [1.32, -.1, 0], M.dark);
-    for (let i = 0; i < 3; i++) cyl(g, .09, .09, .22, [1.42, -.1, -.16 + i * .16], M.gold, 24, [0, 0, Math.PI / 2]);
-    // Base rim
-    box(g, [2.25, .12, .12], [0, -.65, .84], M.dark);
-    // Additional detail: cooling fins on rear
-    for (let i = 0; i < 6; i++) box(g, [.04, .5, .04], [-1.15 + i * .07, .1, -.86], M.steel);
-    // Branding plate
-    box(g, [.6, .18, .02], [0, .35, .84], M.gold);
+    box(g, [2.32, 0.12, 1.48], [0, 0.68, 0], M.steel);
+    box(g, [2.05, 0.05, 1.22], [0, 0.77, 0], M.dark);
+    for (let i = 0; i < 9; i++) box(g, [0.045, 0.035, 0.7], [-0.78 + i * 0.195, 0.81, 0], M.blue);
+    for (const x of [-0.92, 0.92]) for (const z of [-0.55, 0.55]) bolt(g, [x, 0.79, z]);
+    box(g, [0.14, 0.45, 0.5], [1.32, -0.1, 0], M.dark);
+    for (let i = 0; i < 3; i++) cyl(g, 0.09, 0.09, 0.22, [1.42, -0.1, -0.16 + i * 0.16], M.gold, 24, [0, 0, Math.PI / 2]);
+    box(g, [2.25, 0.12, 0.12], [0, -0.65, 0.84], M.dark);
+    for (let i = 0; i < 6; i++) box(g, [0.04, 0.5, 0.04], [-1.15 + i * 0.07, 0.1, -0.86], M.steel);
+    box(g, [0.6, 0.18, 0.02], [0, 0.35, 0.84], M.gold);
   }
 
-  // ---- Production Template Pack ----
   function template(g) {
     const s = new THREE.Shape();
-    s.moveTo(-1.5, -.85); s.lineTo(1.35, -.85); s.lineTo(1.5, -.55);
-    s.lineTo(1.5, .55); s.lineTo(1.2, .85); s.lineTo(-1.5, .85); s.closePath();
+    s.moveTo(-1.5, -0.85); s.lineTo(1.35, -0.85); s.lineTo(1.5, -0.55);
+    s.lineTo(1.5, 0.55); s.lineTo(1.2, 0.85); s.lineTo(-1.5, 0.85); s.closePath();
     const h = new THREE.Path();
-    h.absellipse(-.85, 0, .22, .22, 0, Math.PI * 2, true, 0);
+    h.absellipse(-0.85, 0, 0.22, 0.22, 0, Math.PI * 2, true, 0);
     s.holes.push(h);
     const plate = new THREE.Mesh(
-      new THREE.ExtrudeGeometry(s, { depth: .045, bevelEnabled: true, bevelSegments: 2, bevelSize: .025, bevelThickness: .025 }),
+      new THREE.ExtrudeGeometry(s, { depth: 0.045, bevelEnabled: true, bevelSegments: 2, bevelSize: 0.025, bevelThickness: 0.025 }),
       M.gold
     );
-    plate.rotation.x = -Math.PI / 2; plate.position.y = -.2; plate.castShadow = true; g.add(plate);
-    // Guide rails
-    for (let i = 0; i < 5; i++) box(g, [.025, .025, 1.1], [-.95 + i * .45, -.12, 0], M.steel);
-    // Alignment pins
-    for (const x of [-1.25, 1.25]) for (const z of [-.6, .6]) {
-      cyl(g, .05, .05, .18, [x, -.08, z], M.steel, 16);
-    }
-    // Registration tabs
-    for (const x of [-.9, .9]) box(g, [.2, .04, .1], [x, -.05, .72], M.blue);
-    // Corner notches
-    for (const x of [-1.35, 1.35]) for (const z of [-.75, .75]) box(g, [.08, .02, .08], [x, -.17, z], M.dark);
+    plate.rotation.x = -Math.PI / 2; plate.position.y = -0.2; plate.castShadow = true; g.add(plate);
+    for (let i = 0; i < 5; i++) box(g, [0.025, 0.025, 1.1], [-0.95 + i * 0.45, -0.12, 0], M.steel);
+    for (const x of [-1.25, 1.25]) for (const z of [-0.6, 0.6]) cyl(g, 0.05, 0.05, 0.18, [x, -0.08, z], M.steel, 16);
+    for (const x of [-0.9, 0.9]) box(g, [0.2, 0.04, 0.1], [x, -0.05, 0.72], M.blue);
+    for (const x of [-1.35, 1.35]) for (const z of [-0.75, 0.75]) box(g, [0.08, 0.02, 0.08], [x, -0.17, z], M.dark);
   }
 
-  // ---- Detailed Part Drawing (technical) ----
   function drawing(g) {
-    // Base plate representing the drawing sheet
-    box(g, [3.6, .06, 2.35], [0, -.15, 0], M.dark);
-    const lm = new THREE.MeshBasicMaterial({ color: '#9bd1ff' });
-    const line = (x1, z1, x2, z2, w = .012) => {
+    box(g, [3.6, 0.06, 2.35], [0, -0.15, 0], M.dark);
+    const lm = new THREE.MeshBasicMaterial({ color: '#cccccc' });
+    const line = (x1, z1, x2, z2, w = 0.012) => {
       const dx = x2 - x1, dz = z2 - z1, l = Math.hypot(dx, dz);
-      const o = new THREE.Mesh(new THREE.BoxGeometry(l, .012, w), lm);
-      o.position.set((x1 + x2) / 2, -.105, (z1 + z2) / 2);
+      const o = new THREE.Mesh(new THREE.BoxGeometry(l, 0.012, w), lm);
+      o.position.set((x1 + x2) / 2, -0.105, (z1 + z2) / 2);
       o.rotation.y = -Math.atan2(dz, dx); g.add(o);
     };
-    // Orthographic views
-    [[-1.35, -.45, -.15, -.45], [-1.35, .45, -.15, .45], [-1.35, -.45, -1.35, .45], [-.15, -.45, -.15, .45],
-     [.2, -.45, 1.35, -.45], [.2, .45, 1.35, .45], [.2, -.45, .2, .45], [1.35, -.45, 1.35, .45],
-     [-1.35, .75, -.15, .75], [.2, .75, 1.35, .75]].forEach(a => line(...a));
-    // Center lines (dashed)
-    for (let i = 0; i < 12; i++) {
-      if (i % 2 === 0) line(-1.35 + i * .1, -.9, -1.35 + i * .1, .9, .006);
+    [[-1.35, -0.45, -0.15, -0.45], [-1.35, 0.45, -0.15, 0.45], [-1.35, -0.45, -1.35, 0.45], [-0.15, -0.45, -0.15, 0.45],
+     [0.2, -0.45, 1.35, -0.45], [0.2, 0.45, 1.35, 0.45], [0.2, -0.45, 0.2, 0.45], [1.35, -0.45, 1.35, 0.45],
+     [-1.35, 0.75, -0.15, 0.75], [0.2, 0.75, 1.35, 0.75]].forEach(a => line(...a));
+    for (let i = 0; i < 12; i++) if (i % 2 === 0) line(-1.35 + i * 0.1, -0.9, -1.35 + i * 0.1, 0.9, 0.006);
+    const am = new THREE.MeshBasicMaterial({ color: '#e0e0e0' });
+    for (const [x, z] of [[-1.35, -0.55], [-0.15, -0.55], [0.2, -0.55], [1.35, -0.55]]) {
+      const a = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.12, 8), am);
+      a.position.set(x, -0.1, z); a.rotation.x = Math.PI / 2; g.add(a);
     }
-    // Dimension arrows
-    const am = new THREE.MeshBasicMaterial({ color: '#ffb454' });
-    for (const [x, z] of [[-1.35, -.55], [-.15, -.55], [.2, -.55], [1.35, -.55]]) {
-      const a = new THREE.Mesh(new THREE.ConeGeometry(.04, .12, 8), am);
-      a.position.set(x, -.1, z); a.rotation.x = Math.PI / 2; g.add(a);
-    }
-    // Title block
-    box(g, [1.2, .02, .35], [1.1, -.1, .9], M.white);
-    for (let i = 0; i < 3; i++) line(.55 + i * .35, .75, .55 + i * .35, 1.05, .008);
-    // Hole callouts
-    for (const [x, z] of [[-.85, .2], [.85, -.2]]) {
-      cyl(g, .12, .12, .02, [x, -.1, z], M.steel, 24);
-      cyl(g, .06, .06, .03, [x, -.09, z], M.dark, 16);
+    box(g, [1.2, 0.02, 0.35], [1.1, -0.1, 0.9], M.white);
+    for (let i = 0; i < 3; i++) line(0.55 + i * 0.35, 0.75, 0.55 + i * 0.35, 1.05, 0.008);
+    for (const [x, z] of [[-0.85, 0.2], [0.85, -0.2]]) {
+      cyl(g, 0.12, 0.12, 0.02, [x, -0.1, z], M.steel, 24);
+      cyl(g, 0.06, 0.06, 0.03, [x, -0.09, z], M.dark, 16);
     }
   }
 
-  // ---- Exploded View Package ----
   function exploded(g) {
-    // Base
-    box(g, [2.6, .18, 1.6], [0, -.8, 0], M.cast);
-    // Exploded stack of parts
-    box(g, [2.2, .15, 1.3], [0, -.45, 0], M.dark);
-    box(g, [2.0, .12, 1.15], [0, -.15, 0], M.steel);
-    box(g, [1.7, .1, .95], [0, .15, 0], M.blue);
-    box(g, [1.4, .08, .75], [0, .42, 0], M.gold);
-    // Exploded fasteners
-    for (const x of [-.85, .85]) for (const z of [-.5, .5]) {
-      cyl(g, .07, .07, .3, [x, .65, z], M.steel, 16);
-      cyl(g, .1, .1, .06, [x, .82, z], M.gold, 16);
+    box(g, [2.6, 0.18, 1.6], [0, -0.8, 0], M.cast);
+    box(g, [2.2, 0.15, 1.3], [0, -0.45, 0], M.dark);
+    box(g, [2.0, 0.12, 1.15], [0, -0.15, 0], M.steel);
+    box(g, [1.7, 0.1, 0.95], [0, 0.15, 0], M.blue);
+    box(g, [1.4, 0.08, 0.75], [0, 0.42, 0], M.gold);
+    for (const x of [-0.85, 0.85]) for (const z of [-0.5, 0.5]) {
+      cyl(g, 0.07, 0.07, 0.3, [x, 0.65, z], M.steel, 16);
+      cyl(g, 0.1, 0.1, 0.06, [x, 0.82, z], M.gold, 16);
     }
-    // Connecting dashed lines (thin cylinders)
-    const lm = new THREE.MeshBasicMaterial({ color: '#5a8bb0', transparent: true, opacity: .5 });
-    for (const [x, z] of [[-.85, -.5], [.85, -.5], [-.85, .5], [.85, .5]]) {
-      const l = new THREE.Mesh(new THREE.CylinderGeometry(.008, .008, 1.5, 6), lm);
-      l.position.set(x, -.05, z); g.add(l);
+    const lm = new THREE.MeshBasicMaterial({ color: '#666666', transparent: true, opacity: 0.5 });
+    for (const [x, z] of [[-0.85, -0.5], [0.85, -0.5], [-0.85, 0.5], [0.85, 0.5]]) {
+      const l = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 1.5, 6), lm);
+      l.position.set(x, -0.05, z); g.add(l);
     }
-    // Balloons
     for (let i = 0; i < 4; i++) {
-      const b = new THREE.Mesh(new THREE.TorusGeometry(.08, .012, 6, 20), M.gold);
-      b.position.set(-1.4 + i * .35, .3 + (i % 2) * .3, .9); g.add(b);
+      const b = new THREE.Mesh(new THREE.TorusGeometry(0.08, 0.012, 6, 20), M.gold);
+      b.position.set(-1.4 + i * 0.35, 0.3 + (i % 2) * 0.3, 0.9); g.add(b);
     }
   }
 
-  // ---- Nesting Template Layout ----
   function nesting(g) {
-    // Base sheet
-    box(g, [3.2, .04, 2.0], [0, -.15, 0], M.dark);
-    // Nested parts (various shapes)
+    box(g, [3.2, 0.04, 2.0], [0, -0.15, 0], M.dark);
     const shapes = [
-      { s: [.9, .04, .5], p: [-.95, -.08, -.5], m: M.cast },
-      { s: [.7, .04, .4], p: [-.95, -.08, .15], m: M.gold },
-      { s: [.6, .04, .55], p: [-.95, -.08, .65], m: M.blue },
-      { s: [.55, .04, .55], p: [.0, -.08, -.55], m: M.steel },
-      { s: [.5, .04, .5], p: [.05, -.08, .1], m: M.green },
-      { s: [.45, .04, .4], p: [.1, -.08, .6], m: M.orange },
-      { s: [.5, .04, .6], p: [.9, -.08, -.5], m: M.copper },
-      { s: [.4, .04, .5], p: [.95, -.08, .1], m: M.cast },
-      { s: [.55, .04, .45], p: [.9, -.08, .65], m: M.gold },
+      { s: [0.9, 0.04, 0.5], p: [-0.95, -0.08, -0.5], m: M.cast },
+      { s: [0.7, 0.04, 0.4], p: [-0.95, -0.08, 0.15], m: M.gold },
+      { s: [0.6, 0.04, 0.55], p: [-0.95, -0.08, 0.65], m: M.blue },
+      { s: [0.55, 0.04, 0.55], p: [0.0, -0.08, -0.55], m: M.steel },
+      { s: [0.5, 0.04, 0.5], p: [0.05, -0.08, 0.1], m: M.green },
+      { s: [0.45, 0.04, 0.4], p: [0.1, -0.08, 0.6], m: M.orange },
+      { s: [0.5, 0.04, 0.6], p: [0.9, -0.08, -0.5], m: M.copper },
+      { s: [0.4, 0.04, 0.5], p: [0.95, -0.08, 0.1], m: M.cast },
+      { s: [0.55, 0.04, 0.45], p: [0.9, -0.08, 0.65], m: M.gold },
     ];
     shapes.forEach(({ s, p, m }) => box(g, s, p, m));
-    // Cutout holes
-    for (const [x, z] of [[-.95, -.35], [.0, -.3], [.9, -.35], [.95, .3]]) {
-      cyl(g, .09, .09, .06, [x, -.06, z], M.rubber, 20);
+    for (const [x, z] of [[-0.95, -0.35], [0.0, -0.3], [0.9, -0.35], [0.95, 0.3]]) {
+      cyl(g, 0.09, 0.09, 0.06, [x, -0.06, z], M.rubber, 20);
     }
-    // Material boundary
-    const bm = new THREE.MeshBasicMaterial({ color: '#4fae7a' });
+    const bm = new THREE.MeshBasicMaterial({ color: '#888888' });
     const edges = [
       [-1.55, -0.95, 1.55, -0.95], [1.55, -0.95, 1.55, 0.95],
       [1.55, 0.95, -1.55, 0.95], [-1.55, 0.95, -1.55, -0.95]
     ];
     edges.forEach(([x1, z1, x2, z2]) => {
-      const l = new THREE.Mesh(new THREE.BoxGeometry(Math.hypot(x2 - x1, z2 - z1), .012, .012), bm);
-      l.position.set((x1 + x2) / 2, -.09, (z1 + z2) / 2);
+      const l = new THREE.Mesh(new THREE.BoxGeometry(Math.hypot(x2 - x1, z2 - z1), 0.012, 0.012), bm);
+      l.position.set((x1 + x2) / 2, -0.09, (z1 + z2) / 2);
       l.rotation.y = -Math.atan2(z2 - z1, x2 - x1); g.add(l);
     });
   }
 
-  // ---- Modular Bracket Assembly (new, more realistic) ----
   function bracketAssembly(g) {
-    // Base plate
-    box(g, [2.4, .2, 1.6], [0, -.75, 0], M.cast);
-    for (const x of [-.9, .9]) for (const z of [-.55, .55]) bolt(g, [x, -.62, z], .07);
-    // Vertical columns
-    for (const x of [-.85, .85]) {
-      box(g, [.3, 1.4, .3], [x, .05, 0], M.steel);
-      box(g, [.42, .1, .42], [x, -.55, 0], M.dark);
-      box(g, [.42, .1, .42], [x, .75, 0], M.dark);
+    box(g, [2.4, 0.2, 1.6], [0, -0.75, 0], M.cast);
+    for (const x of [-0.9, 0.9]) for (const z of [-0.55, 0.55]) bolt(g, [x, -0.62, z], 0.07);
+    for (const x of [-0.85, 0.85]) {
+      box(g, [0.3, 1.4, 0.3], [x, 0.05, 0], M.steel);
+      box(g, [0.42, 0.1, 0.42], [x, -0.55, 0], M.dark);
+      box(g, [0.42, 0.1, 0.42], [x, 0.75, 0], M.dark);
     }
-    // Cross bar
-    box(g, [2.0, .22, .26], [0, .75, 0], M.dark);
-    // Sliding carriage
-    box(g, [.7, .5, .9], [0, .42, 0], M.gold);
-    box(g, [.9, .12, 1.0], [0, .7, 0], M.cast);
-    // Bearings
-    for (const z of [-.35, .35]) cyl(g, .1, .1, .7, [0, .42, z], M.steel, 24, [Math.PI / 2, 0, 0]);
-    // Lead screw
-    cyl(g, .07, .07, 1.8, [0, .2, 0], M.steel, 20);
-    for (let i = 0; i < 14; i++) torus(g, .08, .012, [0, -.55 + i * .12, 0], M.copper, [Math.PI / 2, 0, 0], 20);
-    // Handwheel
-    cyl(g, .22, .22, .06, [0, -.85, 0], M.dark, 32);
+    box(g, [2.0, 0.22, 0.26], [0, 0.75, 0], M.dark);
+    box(g, [0.7, 0.5, 0.9], [0, 0.42, 0], M.gold);
+    box(g, [0.9, 0.12, 1.0], [0, 0.7, 0], M.cast);
+    for (const z of [-0.35, 0.35]) cyl(g, 0.1, 0.1, 0.7, [0, 0.42, z], M.steel, 24, [Math.PI / 2, 0, 0]);
+    cyl(g, 0.07, 0.07, 1.8, [0, 0.2, 0], M.steel, 20);
+    for (let i = 0; i < 14; i++) torus(g, 0.08, 0.012, [0, -0.55 + i * 0.12, 0], M.copper, [Math.PI / 2, 0, 0], 20);
+    cyl(g, 0.22, 0.22, 0.06, [0, -0.85, 0], M.dark, 32);
     for (let i = 0; i < 4; i++) {
-      const h = box(g, [.5, .05, .08], [0, -.85, 0], M.gold);
+      const h = box(g, [0.5, 0.05, 0.08], [0, -0.85, 0], M.gold);
       h.rotation.y = i * Math.PI / 2;
     }
-    cyl(g, .06, .06, .3, [0, -1.0, 0], M.steel, 16);
-    // Side support brackets
-    for (const x of [-.85, .85]) {
-      const br = box(g, [.1, .6, .5], [x * 1.1, .0, 0], M.green);
-      br.rotation.z = x > 0 ? -.3 : .3;
+    cyl(g, 0.06, 0.06, 0.3, [0, -1.0, 0], M.steel, 16);
+    for (const x of [-0.85, 0.85]) {
+      const br = box(g, [0.1, 0.6, 0.5], [x * 1.1, 0.0, 0], M.green);
+      br.rotation.z = x > 0 ? -0.3 : 0.3;
     }
-    // Mounting tabs
-    for (const x of [-1.2, 1.2]) box(g, [.2, .08, .5], [x, -.62, 0], M.orange);
+    for (const x of [-1.2, 1.2]) box(g, [0.2, 0.08, 0.5], [x, -0.62, 0], M.orange);
   }
 
-  /* ============================================================
-     SCENE FACTORY
-     ============================================================ */
   function buildModel(type, explodedFlag = false) {
     const g = new THREE.Group();
     switch (type) {
@@ -301,176 +287,197 @@ document.addEventListener('DOMContentLoaded', () => {
     return g;
   }
 
-  function makeScene(canvas, type, hero = false) {
-    if (!canvas) return;
+  /* ============================================================
+     SCENE FACTORY
+     ============================================================ */
+  const gltfLoader = new GLTFLoader();
+
+  function makeScene(canvas, typeOrUrl, hero = false) {
+    if (!canvas) return null;
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(hero ? '#101d2b' : '#102033');
-    scene.fog = new THREE.Fog(scene.background, 8, 18);
-    const camera = new THREE.PerspectiveCamera(hero ? 36 : 34, 1, .1, 100);
+    scene.background = new THREE.Color(hero ? '#0c0c0c' : '#0a0a0a');
+    scene.fog = new THREE.Fog(scene.background, 9, 20);
+
+    const camera = new THREE.PerspectiveCamera(hero ? 36 : 34, 1, 0.1, 100);
     camera.position.set(4.6, 3.1, 5.5);
+
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 1.05;
 
-    scene.add(new THREE.HemisphereLight(0xc9e3ff, 0x263342, 2));
-    const key = new THREE.DirectionalLight(0xffffff, 3.1);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x222222, 1.6));
+    const key = new THREE.DirectionalLight(0xffffff, 2.4);
     key.position.set(4, 7, 5); key.castShadow = true; scene.add(key);
-    const rim = new THREE.DirectionalLight(0x69aaff, 2.1);
+    const rim = new THREE.DirectionalLight(0xaaaaaa, 1.4);
     rim.position.set(-5, 3, -4); scene.add(rim);
 
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(30, 30),
-      new THREE.MeshStandardMaterial({ color: '#101b28', roughness: .7 })
+      new THREE.MeshStandardMaterial({ color: '#111111', roughness: 0.8 })
     );
     floor.rotation.x = -Math.PI / 2; floor.position.y = -1.02; floor.receiveShadow = true; scene.add(floor);
-    const grid = new THREE.GridHelper(12, 24, 0x34516b, 0x20374d);
+    const grid = new THREE.GridHelper(12, 24, 0x444444, 0x222222);
     grid.position.y = -1.005; scene.add(grid);
 
-    const model = buildModel(type, type === 'assembly');
+    let model = new THREE.Group();
     scene.add(model);
+
+    const isUrl = typeof typeOrUrl === 'string' && (typeOrUrl.startsWith('http') || typeOrUrl.endsWith('.glb') || typeOrUrl.endsWith('.gltf'));
+    if (isUrl) {
+      gltfLoader.load(typeOrUrl, (gltf) => {
+        scene.remove(model);
+        model = gltf.scene;
+        // Center & scale
+        const box3 = new THREE.Box3().setFromObject(model);
+        const size = box3.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z) || 1;
+        const scale = 2.4 / maxDim;
+        model.scale.setScalar(scale);
+        const center = box3.getCenter(new THREE.Vector3());
+        model.position.sub(center.multiplyScalar(scale));
+        model.position.y += 0.2;
+        model.traverse(c => { if (c.isMesh) { c.castShadow = c.receiveShadow = true; } });
+        scene.add(model);
+      }, undefined, (err) => {
+        console.warn('GLB load failed, falling back to procedural', err);
+        scene.remove(model);
+        model = buildModel('vise');
+        scene.add(model);
+      });
+    } else {
+      model = buildModel(typeOrUrl || 'vise', typeOrUrl === 'assembly');
+      scene.add(model);
+    }
 
     let controls = null;
     if (hero) {
       controls = new OrbitControls(camera, canvas);
-      controls.enableDamping = true; controls.dampingFactor = .055;
-      controls.minDistance = 3.5; controls.maxDistance = 9;
-      controls.maxPolarAngle = Math.PI * .49;
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.055;
+      controls.minDistance = 3.5;
+      controls.maxDistance = 9;
+      controls.maxPolarAngle = Math.PI * 0.49;
       controls.target.set(0, 0, 0);
-      controls.autoRotate = !reduced; controls.autoRotateSpeed = .75;
+      controls.autoRotate = !reduced;
+      controls.autoRotateSpeed = 0.7;
     } else {
       camera.position.set(4.2, 2.8, 5.2);
-      if (['template', 'nesting', 'drawing'].includes(type)) {
-        camera.position.set(0, 4.8, .01);
+      if (['template', 'nesting', 'drawing'].includes(typeOrUrl)) {
+        camera.position.set(0, 4.8, 0.01);
       }
       camera.lookAt(0, 0, 0);
-      model.rotation.y = -.25;
+      if (model) model.rotation.y = -0.25;
     }
 
     const resize = () => {
       const w = canvas.clientWidth, h = canvas.clientHeight;
       if (!w || !h) return;
       renderer.setSize(w, h, false);
-      camera.aspect = w / h; camera.updateProjectionMatrix();
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
     };
     const ro = new ResizeObserver(resize);
-    ro.observe(canvas.parentElement);
+    ro.observe(canvas.parentElement || canvas);
     resize();
 
     let frame;
     const render = () => {
       frame = requestAnimationFrame(render);
       controls?.update();
-      if (!hero && !reduced && ['housing', 'assembly'].includes(type)) model.rotation.y += .0025;
+      if (!hero && !reduced && !isUrl && ['housing', 'assembly'].includes(typeOrUrl)) {
+        model.rotation.y += 0.0025;
+      }
       renderer.render(scene, camera);
     };
     render();
 
-    return () => { cancelAnimationFrame(frame); ro.disconnect(); renderer.dispose(); };
+    return () => {
+      cancelAnimationFrame(frame);
+      ro.disconnect();
+      controls?.dispose();
+      renderer.dispose();
+    };
   }
 
+  /* ---------- HERO + DEFAULT PROJECT PREVIEWS ---------- */
   const cleanup = [];
   const heroCleanup = makeScene($('#heroModel'), 'vise', true);
   if (heroCleanup) cleanup.push(heroCleanup);
-  $$('.project-model').forEach(c => {
-    const stop = makeScene(c, c.dataset.model);
-    if (stop) cleanup.push(stop);
-  });
-  document.addEventListener('visibilitychange', () => { if (document.hidden) cleanup.forEach(fn => fn()); });
+
+  // Fallback project cards if Firebase is empty
+  const FALLBACK_PROJECTS = [
+    { id: 'fb-housing', title: 'Packaging Component Set', category: 'product', description: 'Modular product housing designed for efficient assembly and material optimization.', tags: ['SolidWorks', 'DFM'], model: 'housing', kicker: 'PRODUCT · DFM',
+      specs: ['Dimensions: 250 × 165 × 125 mm', 'Material: Glass-filled nylon (PA66-GF30)', 'Process: Injection moulding', 'Tolerance: ±0.15 mm on mating surfaces'] },
+    { id: 'fb-template', title: 'Production Template Pack', category: 'template', description: 'Precision templates and patterns for consistent manufacturing output at scale.', tags: ['AutoCAD', 'Templating'], model: 'template', kicker: 'TEMPLATE · PRECISION',
+      specs: ['Dimensions: 300 × 170 × 12 mm', 'Material: 6082-T6 aluminium', 'Process: CNC milling', 'Flatness: 0.05 mm'] },
+    { id: 'fb-drawing', title: 'Detailed Part Drawing', category: 'drawing', description: 'Full production drawings with dimensions, tolerances, and clear callouts.', tags: ['AutoCAD', 'GD&T'], model: 'drawing', kicker: 'DRAWING · GD&T',
+      specs: ['Sheet size: A2', 'Standards: ISO 2768-mK, ASME Y14.5', 'Views: Front, top, right, isometric', 'Tolerances: ±0.1 mm general'] },
+    { id: 'fb-assembly', title: 'Multi-Part Assembly', category: 'assembly', description: 'Complex assembly modeling with clear mate relationships and motion studies.', tags: ['SolidWorks', 'Assembly'], model: 'assembly', kicker: 'ASSEMBLY · MOTION',
+      specs: ['Parts: 14 unique components', 'Materials: Steel, aluminium, bronze', 'Motion: 120 mm carriage travel', 'Mates: Concentric, coincident, limit'] },
+    { id: 'fb-exploded', title: 'Exploded View Package', category: 'drawing', description: 'Exploded assembly drawings with item balloons and parts list for production.', tags: ['SolidWorks', 'Documentation'], model: 'exploded', kicker: 'DOCUMENTATION · EXPLODED',
+      specs: ['Format: A3 exploded isometric', 'Balloons: 4 item references', 'Parts list: 8 line items', 'Standards: ASME Y14.34'] },
+    { id: 'fb-nesting', title: 'Nesting Template Layout', category: 'template', description: 'Optimized nesting templates to maximize material yield and reduce waste.', tags: ['AutoCAD', 'Templating'], model: 'nesting', kicker: 'TEMPLATE · NESTING',
+      specs: ['Sheet size: 320 × 200 mm', 'Parts nested: 9 unique blanks', 'Material yield: 87%', 'Process: Laser cutting'] },
+  ];
+
+  let liveProjects = [...FALLBACK_PROJECTS];
+
+  function renderGallery(projects) {
+    const gallery = $('#gallery');
+    if (!gallery) return;
+    // Clean previous procedural canvases
+    cleanup.splice(1).forEach(fn => fn());
+    gallery.innerHTML = '';
+
+    projects.forEach((p, i) => {
+      const article = document.createElement('article');
+      article.className = 'project-card reveal visible';
+      article.dataset.category = p.category || 'product';
+      article.dataset.project = p.id;
+      article.style.transitionDelay = `${(i % 6) * 0.05}s`;
+
+      const hasGlb = p.modelUrl && (p.modelUrl.includes('.glb') || p.modelUrl.includes('.gltf') || p.modelUrl.startsWith('http'));
+      const hasThumb = p.thumbnailUrl;
+
+      let visualHtml;
+      if (hasThumb) {
+        visualHtml = `<img class="project-thumb" src="${p.thumbnailUrl}" alt="${p.title}">`;
+      } else {
+        visualHtml = `<canvas class="project-model" data-model="${p.model || 'vise'}" data-url="${p.modelUrl || ''}" aria-label="3D model"></canvas>`;
+      }
+
+      article.innerHTML = `
+        <div class="project-visual">
+          ${visualHtml}
+          <div class="project-overlay"><span class="project-tag">${(p.category || 'product').toUpperCase()}</span></div>
+        </div>
+        <div class="project-info">
+          <h3>${p.title}</h3>
+          <p>${p.description || ''}</p>
+          <div class="project-meta">${(p.tags || []).slice(0, 3).map(t => `<span>${t}</span>`).join('')}</div>
+        </div>
+      `;
+      article.addEventListener('click', () => openProjectModal(p));
+      gallery.appendChild(article);
+
+      if (!hasThumb) {
+        const canvas = article.querySelector('.project-model');
+        if (canvas) {
+          const src = hasGlb ? p.modelUrl : (p.model || 'vise');
+          const stop = makeScene(canvas, src, false);
+          if (stop) cleanup.push(stop);
+        }
+      }
+    });
+  }
 
   /* ============================================================
-     PROJECT DETAIL MODAL
+     PROJECT MODAL
      ============================================================ */
-  const PROJECTS = {
-    housing: {
-      title: 'Packaging Component Set',
-      category: 'Product Design',
-      kicker: 'PRODUCT · DFM',
-      description: 'A modular product housing system designed for efficient assembly and material optimization. The housing features a recessed lid with ventilation slots, a dedicated side connector block for wiring pass-through, and a reinforced base rim that allows snap-fit assembly without fasteners. Internal cooling fins manage heat dissipation in enclosed environments.',
-      specs: [
-        'Dimensions: 250 × 165 × 125 mm',
-        'Material: Glass-filled nylon (PA66-GF30)',
-        'Process: Injection moulding',
-        'Tolerance: ±0.15 mm on mating surfaces',
-      ],
-      tags: ['SolidWorks', 'DFM', 'Injection Moulding', 'Snap-fit'],
-      model: 'housing',
-    },
-    template: {
-      title: 'Production Template Pack',
-      category: 'Template',
-      kicker: 'TEMPLATE · PRECISION',
-      description: 'A precision production template used to align and locate components during fabrication. The plate is CNC-machined from aluminium tooling plate and features hardened guide rails, alignment pins, and registration tabs. The central elliptical cut-out provides clearance for a rotating shaft assembly, while corner notches ensure correct orientation on the fixture table.',
-      specs: [
-        'Dimensions: 300 × 170 × 12 mm',
-        'Material: 6082-T6 aluminium tooling plate',
-        'Process: CNC milling',
-        'Flatness: 0.05 mm over full length',
-      ],
-      tags: ['AutoCAD', 'Templating', 'CNC', 'Fixtures'],
-      model: 'template',
-    },
-    drawing: {
-      title: 'Detailed Part Drawing',
-      category: 'Technical Drawing',
-      kicker: 'DRAWING · GD&T',
-      description: 'A full production drawing set for a machined component, including orthographic views, section cuts, and a title block with revision history. Dimensions and tolerances are specified per ISO 2768-mK, with geometric tolerancing (GD&T) applied to critical features. Hole callouts reference standard fastener sizes.',
-      specs: [
-        'Sheet size: A2 (420 × 594 mm)',
-        'Standards: ISO 2768-mK, ASME Y14.5',
-        'Views: Front, top, right, isometric',
-        'Tolerances: ±0.1 mm general, ±0.02 mm critical',
-      ],
-      tags: ['AutoCAD', 'GD&T', 'ISO 2768', 'Production'],
-      model: 'drawing',
-    },
-    assembly: {
-      title: 'Multi-Part Assembly',
-      category: 'Assembly',
-      kicker: 'ASSEMBLY · MOTION',
-      description: 'A multi-part mechanical assembly consisting of a base plate, twin vertical columns, a sliding carriage, lead screw, and handwheel. The assembly is modelled with proper mate relationships (concentric, coincident, and limit mates) to simulate the carriage travel. The lead screw uses a helical thread representation for realistic motion studies.',
-      specs: [
-        'Parts: 14 unique components',
-        'Materials: Steel, aluminium, bronze',
-        'Motion: 120 mm carriage travel',
-        'Mates: Concentric, coincident, limit',
-      ],
-      tags: ['SolidWorks', 'Assembly', 'Motion Study', 'Mate Relationships'],
-      model: 'assembly',
-    },
-    exploded: {
-      title: 'Exploded View Package',
-      category: 'Technical Drawing',
-      kicker: 'DOCUMENTATION · EXPLODED',
-      description: 'An exploded assembly drawing with item balloons and a parts list, used for production documentation and assembly instructions. Each component is separated along its assembly axis with dashed leader lines connecting the exploded positions. Balloons reference the bill of materials for traceability.',
-      specs: [
-        'Format: A3 exploded isometric',
-        'Balloons: 4 item references',
-        'Parts list: 8 line items',
-        'Standards: ASME Y14.34',
-      ],
-      tags: ['SolidWorks', 'Documentation', 'BOM', 'Exploded View'],
-      model: 'exploded',
-    },
-    nesting: {
-      title: 'Nesting Template Layout',
-      category: 'Template',
-      kicker: 'TEMPLATE · NESTING',
-      description: 'An optimized nesting layout that arranges multiple part blanks on a single sheet to maximize material yield and reduce waste. Parts are rotated and packed using a heuristic nesting algorithm, with cut-out holes pre-drilled for downstream operations. The material boundary is shown in green.',
-      specs: [
-        'Sheet size: 320 × 200 mm',
-        'Parts nested: 9 unique blanks',
-        'Material yield: 87%',
-        'Process: Laser cutting',
-      ],
-      tags: ['AutoCAD', 'Templating', 'Nesting', 'Laser Cutting'],
-      model: 'nesting',
-    },
-  };
-
   const modal = $('#projectModal');
   const modalBackdrop = $('#modalBackdrop');
   const modalClose = $('#modalClose');
@@ -480,31 +487,33 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalDesc = $('#modalDescription');
   const modalSpecs = $('#modalSpecs');
   const modalTags = $('#modalTags');
+  const modalLoading = $('#modalLoading');
 
   let modalCleanup = null;
   let modalOpen = false;
 
-  function openProjectModal(projectId) {
-    const data = PROJECTS[projectId];
+  function openProjectModal(data) {
     if (!data) return;
+    modalTitle.textContent = data.title || 'Project';
+    modalKicker.textContent = data.kicker || (data.category || 'PROJECT').toUpperCase();
+    modalDesc.textContent = data.description || '';
+    const specs = data.specs || [];
+    modalSpecs.innerHTML = specs.map(s => `<div class="modal-spec">${s}</div>`).join('');
+    const tags = data.tags || [];
+    modalTags.innerHTML = tags.map(t => `<span>${t}</span>`).join('');
 
-    // Populate text
-    modalTitle.textContent = data.title;
-    modalKicker.textContent = data.kicker;
-    modalDesc.textContent = data.description;
-    modalSpecs.innerHTML = data.specs.map(s => `<div class="modal-spec">${s}</div>`).join('');
-    modalTags.innerHTML = data.tags.map(t => `<span>${t}</span>`).join('');
-
-    // Show modal
     modal.hidden = false;
     requestAnimationFrame(() => modal.classList.add('open'));
     modalOpen = true;
     document.body.style.overflow = 'hidden';
 
-    // Build modal 3D scene after layout so canvas has dimensions
+    if (modalLoading) modalLoading.hidden = false;
+
     requestAnimationFrame(() => {
       if (modalCleanup) { modalCleanup(); modalCleanup = null; }
-      modalCleanup = makeModalScene(modalCanvas, data.model);
+      const src = data.modelUrl || data.model || 'vise';
+      modalCleanup = makeModalScene(modalCanvas, src);
+      if (modalLoading) setTimeout(() => { modalLoading.hidden = true; }, 600);
     });
   }
 
@@ -519,15 +528,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 280);
   }
 
-  function makeModalScene(canvas, type) {
+  function makeModalScene(canvas, typeOrUrl) {
     if (!canvas) return null;
-
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#0d1a28');
-    scene.fog = new THREE.Fog(scene.background, 9, 20);
+    scene.background = new THREE.Color('#0a0a0a');
+    scene.fog = new THREE.Fog(scene.background, 10, 22);
 
-    const camera = new THREE.PerspectiveCamera(32, 1, .1, 100);
-    // True isometric-ish view: 45° azimuth, 35.264° elevation
+    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
     const isoDist = 6.2;
     camera.position.set(
       isoDist * Math.sin(45 * Math.PI / 180) * Math.cos(35.264 * Math.PI / 180),
@@ -542,46 +549,70 @@ document.addEventListener('DOMContentLoaded', () => {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
+    renderer.toneMappingExposure = 1.1;
 
-    scene.add(new THREE.HemisphereLight(0xcfe6ff, 0x1d2a38, 2.2));
-    const key = new THREE.DirectionalLight(0xffffff, 3.2);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x1a1a1a, 1.8));
+    const key = new THREE.DirectionalLight(0xffffff, 2.6);
     key.position.set(5, 8, 6); key.castShadow = true; scene.add(key);
-    const rim = new THREE.DirectionalLight(0x6aa8ff, 2.0);
+    const rim = new THREE.DirectionalLight(0xbbbbbb, 1.5);
     rim.position.set(-6, 4, -5); scene.add(rim);
-    const fill = new THREE.DirectionalLight(0xffd9a0, .6);
-    fill.position.set(-3, -2, 4); scene.add(fill);
 
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(30, 30),
-      new THREE.MeshStandardMaterial({ color: '#0f1a26', roughness: .75 })
+      new THREE.MeshStandardMaterial({ color: '#0e0e0e', roughness: 0.8 })
     );
     floor.rotation.x = -Math.PI / 2; floor.position.y = -1.02; floor.receiveShadow = true; scene.add(floor);
-    const grid = new THREE.GridHelper(14, 28, 0x3c5a78, 0x22384f);
+    const grid = new THREE.GridHelper(14, 28, 0x3a3a3a, 0x1e1e1e);
     grid.position.y = -1.005; scene.add(grid);
 
-    const model = buildModel(type, false);
+    let model = new THREE.Group();
     scene.add(model);
+
+    const isUrl = typeof typeOrUrl === 'string' && (typeOrUrl.startsWith('http') || typeOrUrl.includes('.glb') || typeOrUrl.includes('.gltf'));
+    if (isUrl) {
+      gltfLoader.load(typeOrUrl, (gltf) => {
+        scene.remove(model);
+        model = gltf.scene;
+        const box3 = new THREE.Box3().setFromObject(model);
+        const size = box3.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z) || 1;
+        const scale = 2.6 / maxDim;
+        model.scale.setScalar(scale);
+        const center = box3.getCenter(new THREE.Vector3());
+        model.position.sub(center.multiplyScalar(scale));
+        model.position.y += 0.15;
+        model.traverse(c => { if (c.isMesh) { c.castShadow = c.receiveShadow = true; } });
+        scene.add(model);
+      }, undefined, () => {
+        scene.remove(model);
+        model = buildModel('vise');
+        scene.add(model);
+      });
+    } else {
+      model = buildModel(typeOrUrl || 'vise', false);
+      scene.add(model);
+    }
 
     const controls = new OrbitControls(camera, canvas);
     controls.enableDamping = true;
-    controls.dampingFactor = .06;
+    controls.dampingFactor = 0.06;
     controls.minDistance = 3.5;
     controls.maxDistance = 12;
-    controls.maxPolarAngle = Math.PI * .49;
+    controls.maxPolarAngle = Math.PI * 0.49;
     controls.target.set(0, 0, 0);
     controls.autoRotate = !reduced;
-    controls.autoRotateSpeed = 1.1;
+    controls.autoRotateSpeed = 1.0;
     controls.update();
 
     const resize = () => {
       const w = canvas.clientWidth, h = canvas.clientHeight;
       if (!w || !h) return;
       renderer.setSize(w, h, false);
-      camera.aspect = w / h; camera.updateProjectionMatrix();
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
     };
     const ro = new ResizeObserver(resize);
-    ro.observe(canvas.parentElement);
+    ro.observe(canvas.parentElement || canvas);
     resize();
 
     let frame;
@@ -592,54 +623,441 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     render();
 
-    return () => { cancelAnimationFrame(frame); ro.disconnect(); controls.dispose(); renderer.dispose(); };
+    return () => {
+      cancelAnimationFrame(frame);
+      ro.disconnect();
+      controls.dispose();
+      renderer.dispose();
+    };
   }
-
-  // Card click handlers
-  $$('.project-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const id = card.dataset.project;
-      if (id) openProjectModal(id);
-    });
-  });
 
   modalClose?.addEventListener('click', closeProjectModal);
   modalBackdrop?.addEventListener('click', closeProjectModal);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeProjectModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeProjectModal(); closeAdmin(); } });
 
   /* ============================================================
-     UPLOAD ZONE
+     DATA LOADERS (RTDB)
      ============================================================ */
-  const zone = $('#uploadZone'), input = $('#fileInput'), preview = $('#uploadPreview');
-  $('#browseBtn')?.addEventListener('click', () => input?.click());
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(n =>
-    zone?.addEventListener(n, e => { e.preventDefault(); e.stopPropagation(); }));
-  ['dragenter', 'dragover'].forEach(n => zone?.addEventListener(n, () => zone.classList.add('dragover')));
-  ['dragleave', 'drop'].forEach(n => zone?.addEventListener(n, () => zone.classList.remove('dragover')));
-  zone?.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
-  input?.addEventListener('change', () => handleFiles(input.files));
-
-  function handleFiles(files) {
-    [...(files || [])].filter(f => f.type.startsWith('image/')).forEach(file => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const item = document.createElement('div');
-        item.className = 'preview-item';
-        const img = document.createElement('img');
-        img.src = reader.result; img.alt = file.name;
-        const remove = document.createElement('button');
-        remove.type = 'button'; remove.className = 'remove';
-        remove.textContent = '×';
-        remove.setAttribute('aria-label', 'Remove image');
-        remove.onclick = () => item.remove();
-        item.append(img, remove);
-        preview.append(item);
-      };
-      reader.readAsDataURL(file);
-    });
-    if (input) input.value = '';
+  function toArray(snap) {
+    const val = snap.val();
+    if (!val) return [];
+    return Object.entries(val).map(([id, data]) => ({ id, ...data }))
+      .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
   }
 
+  // Experience
+  onValue(ref(db, 'experiences'), (snap) => {
+    const list = toArray(snap);
+    const el = $('#experienceList');
+    if (!el) return;
+    if (list.length === 0) {
+      el.innerHTML = `
+        <div class="timeline-item">
+          <div class="timeline-period">2023 – Present</div>
+          <div class="timeline-role">CAD Designer</div>
+          <div class="timeline-company">ISHIP LOGIPACK INCORPORATED</div>
+          <div class="timeline-desc">Product design, 3D modeling, and production templating for packaging systems. Focus on design-for-manufacturing and clear technical documentation.</div>
+        </div>`;
+      return;
+    }
+    el.innerHTML = list.map(e => `
+      <div class="timeline-item">
+        <div class="timeline-period">${e.period || ''}</div>
+        <div class="timeline-role">${e.role || ''}</div>
+        <div class="timeline-company">${e.company || ''}</div>
+        <div class="timeline-desc">${e.description || ''}</div>
+      </div>
+    `).join('');
+  });
+
+  // Certifications
+  onValue(ref(db, 'certifications'), (snap) => {
+    const list = toArray(snap);
+    const el = $('#certsList');
+    if (!el) return;
+    if (list.length === 0) {
+      el.innerHTML = `<div class="timeline-placeholder">No certifications added yet. Sign in as admin to add some.</div>`;
+      return;
+    }
+    el.innerHTML = list.map(c => `
+      <div class="cert-card">
+        <div class="cert-title">${c.title || ''}</div>
+        <div class="cert-issuer">${c.issuer || ''}</div>
+        <div class="cert-date">${c.date || ''}</div>
+        ${c.credentialUrl ? `<a class="cert-link" href="${c.credentialUrl}" target="_blank" rel="noopener">View credential →</a>` : ''}
+      </div>
+    `).join('');
+  });
+
+  // Projects
+  onValue(ref(db, 'projects'), (snap) => {
+    const list = toArray(snap);
+    if (list.length > 0) {
+      liveProjects = list.map(p => ({
+        ...p,
+        tags: Array.isArray(p.tags) ? p.tags : (p.tags || '').split(',').map(t => t.trim()).filter(Boolean),
+        specs: Array.isArray(p.specs) ? p.specs : (p.specs || '').split('\n').map(s => s.trim()).filter(Boolean),
+        kicker: p.kicker || (p.category || 'PROJECT').toUpperCase(),
+      }));
+    } else {
+      liveProjects = [...FALLBACK_PROJECTS];
+    }
+    renderGallery(liveProjects);
+  });
+
+  // Initial render with fallbacks
+  renderGallery(liveProjects);
+
+  /* ============================================================
+     ADMIN PANEL
+     ============================================================ */
+  const adminOverlay = $('#adminOverlay');
+  const adminLogin = $('#adminLogin');
+  const adminDashboard = $('#adminDashboard');
+  const loginForm = $('#loginForm');
+  const loginError = $('#loginError');
+
+  function openAdmin() {
+    adminOverlay.hidden = false;
+  }
+  function closeAdmin() {
+    adminOverlay.hidden = true;
+  }
+
+  $('#adminLink')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openAdmin();
+  });
+  $('#adminClose')?.addEventListener('click', closeAdmin);
+
+  // Tabs
+  $$('.admin-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      $$('.admin-tab').forEach(t => t.classList.remove('active'));
+      $$('.admin-tab-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      $(`#tab-${tab.dataset.tab}`)?.classList.add('active');
+    });
+  });
+
+  // Auth state
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      adminLogin.hidden = true;
+      adminDashboard.hidden = false;
+      refreshAdminLists();
+    } else {
+      adminLogin.hidden = false;
+      adminDashboard.hidden = true;
+    }
+  });
+
+  loginForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    loginError.hidden = true;
+    const email = $('#adminEmail').value.trim();
+    const password = $('#adminPassword').value;
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (err) {
+      loginError.textContent = err.message || 'Sign-in failed';
+      loginError.hidden = false;
+    }
+  });
+
+  $('#signOutBtn')?.addEventListener('click', () => signOut(auth));
+
+  /* ----- Admin list helpers ----- */
+  function refreshAdminLists() {
+    // Projects
+    onValue(ref(db, 'projects'), (snap) => {
+      const list = toArray(snap);
+      const el = $('#adminProjectsList');
+      if (!el) return;
+      el.innerHTML = list.length ? list.map(p => `
+        <div class="admin-item">
+          <div class="admin-item-info">
+            <div class="admin-item-title">${p.title}</div>
+            <div class="admin-item-meta">${p.category || ''} · order ${p.order ?? 0}${p.modelUrl ? ' · GLB' : ''}</div>
+          </div>
+          <div class="admin-item-actions">
+            <button type="button" data-edit-project="${p.id}">Edit</button>
+            <button type="button" class="btn-del" data-del-project="${p.id}">Delete</button>
+          </div>
+        </div>
+      `).join('') : '<p class="timeline-placeholder">No projects yet.</p>';
+
+      el.querySelectorAll('[data-edit-project]').forEach(btn => {
+        btn.addEventListener('click', () => editProject(list.find(x => x.id === btn.dataset.editProject)));
+      });
+      el.querySelectorAll('[data-del-project]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (confirm('Delete this project?')) await remove(ref(db, `projects/${btn.dataset.delProject}`));
+        });
+      });
+    }, { onlyOnce: false });
+
+    // Experience
+    onValue(ref(db, 'experiences'), (snap) => {
+      const list = toArray(snap);
+      const el = $('#adminExpList');
+      if (!el) return;
+      el.innerHTML = list.length ? list.map(e => `
+        <div class="admin-item">
+          <div class="admin-item-info">
+            <div class="admin-item-title">${e.role} @ ${e.company}</div>
+            <div class="admin-item-meta">${e.period || ''}</div>
+          </div>
+          <div class="admin-item-actions">
+            <button type="button" data-edit-exp="${e.id}">Edit</button>
+            <button type="button" class="btn-del" data-del-exp="${e.id}">Delete</button>
+          </div>
+        </div>
+      `).join('') : '<p class="timeline-placeholder">No experience entries.</p>';
+
+      el.querySelectorAll('[data-edit-exp]').forEach(btn => {
+        btn.addEventListener('click', () => editExp(list.find(x => x.id === btn.dataset.editExp)));
+      });
+      el.querySelectorAll('[data-del-exp]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (confirm('Delete this entry?')) await remove(ref(db, `experiences/${btn.dataset.delExp}`));
+        });
+      });
+    });
+
+    // Certs
+    onValue(ref(db, 'certifications'), (snap) => {
+      const list = toArray(snap);
+      const el = $('#adminCertsList');
+      if (!el) return;
+      el.innerHTML = list.length ? list.map(c => `
+        <div class="admin-item">
+          <div class="admin-item-info">
+            <div class="admin-item-title">${c.title}</div>
+            <div class="admin-item-meta">${c.issuer || ''} · ${c.date || ''}</div>
+          </div>
+          <div class="admin-item-actions">
+            <button type="button" data-edit-cert="${c.id}">Edit</button>
+            <button type="button" class="btn-del" data-del-cert="${c.id}">Delete</button>
+          </div>
+        </div>
+      `).join('') : '<p class="timeline-placeholder">No certifications.</p>';
+
+      el.querySelectorAll('[data-edit-cert]').forEach(btn => {
+        btn.addEventListener('click', () => editCert(list.find(x => x.id === btn.dataset.editCert)));
+      });
+      el.querySelectorAll('[data-del-cert]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (confirm('Delete this certification?')) await remove(ref(db, `certifications/${btn.dataset.delCert}`));
+        });
+      });
+    });
+  }
+
+  /* ----- Project form ----- */
+  const projectForm = $('#projectForm');
+  $('#addProjectBtn')?.addEventListener('click', () => {
+    projectForm.hidden = false;
+    $('#projectFormTitle').textContent = 'New Project';
+    $('#projectId').value = '';
+    projectForm.reset();
+    $('#pOrder').value = '0';
+  });
+  $('#cancelProjectBtn')?.addEventListener('click', () => { projectForm.hidden = true; });
+
+  function editProject(p) {
+    if (!p) return;
+    projectForm.hidden = false;
+    $('#projectFormTitle').textContent = 'Edit Project';
+    $('#projectId').value = p.id;
+    $('#pTitle').value = p.title || '';
+    $('#pCategory').value = p.category || 'product';
+    $('#pDescription').value = p.description || '';
+    $('#pTags').value = Array.isArray(p.tags) ? p.tags.join(', ') : (p.tags || '');
+    $('#pSpecs').value = Array.isArray(p.specs) ? p.specs.join('\n') : (p.specs || '');
+    $('#pOrder').value = p.order ?? 0;
+  }
+
+  async function uploadFile(file, path, onProgress) {
+    const sRef = storageRef(storage, path);
+    const task = uploadBytesResumable(sRef, file);
+    return new Promise((resolve, reject) => {
+      task.on('state_changed',
+        (snap) => {
+          const pct = (snap.bytesTransferred / snap.totalBytes) * 100;
+          onProgress?.(pct);
+        },
+        reject,
+        async () => {
+          const url = await getDownloadURL(task.snapshot.ref);
+          resolve(url);
+        }
+      );
+    });
+  }
+
+  projectForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errEl = $('#projectError');
+    const prog = $('#projectProgress');
+    const fill = $('#projectProgressFill');
+    const progText = $('#projectProgressText');
+    errEl.hidden = true;
+    prog.hidden = true;
+
+    const id = $('#projectId').value;
+    const title = $('#pTitle').value.trim();
+    const category = $('#pCategory').value;
+    const description = $('#pDescription').value.trim();
+    const tags = $('#pTags').value.split(',').map(t => t.trim()).filter(Boolean);
+    const specs = $('#pSpecs').value.split('\n').map(s => s.trim()).filter(Boolean);
+    const order = parseInt($('#pOrder').value, 10) || 0;
+    const glbFile = $('#pGlb').files[0];
+    const thumbFile = $('#pThumb').files[0];
+
+    try {
+      let modelUrl = null;
+      let thumbnailUrl = null;
+
+      // Keep existing URLs if editing
+      if (id) {
+        const existing = liveProjects.find(p => p.id === id);
+        if (existing) {
+          modelUrl = existing.modelUrl || null;
+          thumbnailUrl = existing.thumbnailUrl || null;
+        }
+      }
+
+      if (glbFile || thumbFile) {
+        prog.hidden = false;
+        fill.style.width = '0%';
+      }
+
+      if (glbFile) {
+        progText.textContent = 'Uploading GLB…';
+        const path = `models/${Date.now()}_${glbFile.name}`;
+        modelUrl = await uploadFile(glbFile, path, (pct) => {
+          fill.style.width = `${pct * 0.7}%`;
+          progText.textContent = `Uploading GLB… ${Math.round(pct)}%`;
+        });
+      }
+
+      if (thumbFile) {
+        progText.textContent = 'Uploading thumbnail…';
+        const path = `thumbnails/${Date.now()}_${thumbFile.name}`;
+        thumbnailUrl = await uploadFile(thumbFile, path, (pct) => {
+          fill.style.width = `${70 + pct * 0.3}%`;
+          progText.textContent = `Uploading thumbnail… ${Math.round(pct)}%`;
+        });
+      }
+
+      fill.style.width = '100%';
+      progText.textContent = 'Saving…';
+
+      const data = {
+        title, category, description, tags, specs, order,
+        modelUrl: modelUrl || null,
+        thumbnailUrl: thumbnailUrl || null,
+        updatedAt: Date.now(),
+      };
+
+      if (id) {
+        await update(ref(db, `projects/${id}`), data);
+      } else {
+        data.createdAt = Date.now();
+        await push(ref(db, 'projects'), data);
+      }
+
+      projectForm.hidden = true;
+      projectForm.reset();
+      prog.hidden = true;
+    } catch (err) {
+      console.error(err);
+      errEl.textContent = err.message || 'Save failed. Check Storage rules and Auth.';
+      errEl.hidden = false;
+      prog.hidden = true;
+    }
+  });
+
+  /* ----- Experience form ----- */
+  const expForm = $('#expForm');
+  $('#addExpBtn')?.addEventListener('click', () => {
+    expForm.hidden = false;
+    $('#expFormTitle').textContent = 'New Experience';
+    $('#expId').value = '';
+    expForm.reset();
+    $('#eOrder').value = '0';
+  });
+  $('#cancelExpBtn')?.addEventListener('click', () => { expForm.hidden = true; });
+
+  function editExp(e) {
+    if (!e) return;
+    expForm.hidden = false;
+    $('#expFormTitle').textContent = 'Edit Experience';
+    $('#expId').value = e.id;
+    $('#eCompany').value = e.company || '';
+    $('#eRole').value = e.role || '';
+    $('#ePeriod').value = e.period || '';
+    $('#eDescription').value = e.description || '';
+    $('#eOrder').value = e.order ?? 0;
+  }
+
+  expForm?.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const id = $('#expId').value;
+    const data = {
+      company: $('#eCompany').value.trim(),
+      role: $('#eRole').value.trim(),
+      period: $('#ePeriod').value.trim(),
+      description: $('#eDescription').value.trim(),
+      order: parseInt($('#eOrder').value, 10) || 0,
+    };
+    if (id) await update(ref(db, `experiences/${id}`), data);
+    else await push(ref(db, 'experiences'), data);
+    expForm.hidden = true;
+    expForm.reset();
+  });
+
+  /* ----- Cert form ----- */
+  const certForm = $('#certForm');
+  $('#addCertBtn')?.addEventListener('click', () => {
+    certForm.hidden = false;
+    $('#certFormTitle').textContent = 'New Certification';
+    $('#certId').value = '';
+    certForm.reset();
+    $('#cOrder').value = '0';
+  });
+  $('#cancelCertBtn')?.addEventListener('click', () => { certForm.hidden = true; });
+
+  function editCert(c) {
+    if (!c) return;
+    certForm.hidden = false;
+    $('#certFormTitle').textContent = 'Edit Certification';
+    $('#certId').value = c.id;
+    $('#cTitle').value = c.title || '';
+    $('#cIssuer').value = c.issuer || '';
+    $('#cDate').value = c.date || '';
+    $('#cUrl').value = c.credentialUrl || '';
+    $('#cOrder').value = c.order ?? 0;
+  }
+
+  certForm?.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const id = $('#certId').value;
+    const data = {
+      title: $('#cTitle').value.trim(),
+      issuer: $('#cIssuer').value.trim(),
+      date: $('#cDate').value.trim(),
+      credentialUrl: $('#cUrl').value.trim() || null,
+      order: parseInt($('#cOrder').value, 10) || 0,
+    };
+    if (id) await update(ref(db, `certifications/${id}`), data);
+    else await push(ref(db, 'certifications'), data);
+    certForm.hidden = true;
+    certForm.reset();
+  });
+
+  /* ---------- CONTACT ---------- */
   $('#contactForm')?.addEventListener('submit', e => {
     e.preventDefault();
     const name = $('#name').value.trim();
@@ -650,6 +1068,5 @@ document.addEventListener('DOMContentLoaded', () => {
     location.href = `mailto:justine.nagrampa@example.com?subject=${subject}&body=${body}`;
   });
 
-  // Progressive enhancement
   document.body.classList.add('js-enabled');
 });
