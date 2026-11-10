@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <!-- Import map is required because Three.js example modules import the bare "three" specifier. -->
   <script type="importmap">
     {
       "imports": {
@@ -20,14 +19,18 @@
   </script>
 </head>
 <body>
-  <!-- Geometric background -->
+  <!-- Technical drawing background -->
   <div class="bg-grid"></div>
-  <div class="bg-glow"></div>
-  <div class="floating-shapes" aria-hidden="true">
-    <div class="float-shape s1"></div>
-    <div class="float-shape s2"></div>
-    <div class="float-shape s3"></div>
-    <div class="float-shape s4"></div>
+  <div class="bg-crosshairs" aria-hidden="true">
+    <span class="crosshair c1"></span>
+    <span class="crosshair c2"></span>
+    <span class="crosshair c3"></span>
+    <span class="crosshair c4"></span>
+  </div>
+  <div class="bg-dimensions" aria-hidden="true">
+    <span class="dim-line d1"></span>
+    <span class="dim-line d2"></span>
+    <span class="dim-line d3"></span>
   </div>
 
   <!-- Navigation -->
