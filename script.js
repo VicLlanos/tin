@@ -1,10 +1,14 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import './js/sheet.js';
+import './js/cloud.js';
+import { parseGLB, fit, disposeObject } from './js/glb.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+  const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   const navbar = $('#navbar'), navToggle = $('#navToggle'), navLinks = $('#navLinks');
   const scroll = () => navbar?.classList.toggle('scrolled', scrollY > 40);
@@ -379,7 +383,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const stop = makeScene(c, c.dataset.model);
     if (stop) cleanup.push(stop);
   });
-  document.addEventListener('visibilitychange', () => { if (document.hidden) cleanup.forEach(fn => fn()); });
 
   /* ============================================================
      PROJECT DETAIL MODAL
@@ -482,18 +485,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalTags = $('#modalTags');
 
   let modalCleanup = null;
-  let modalOpen = false;
+  let modalOpen = false, modalTok = 0, modalApi = null;
 
   function openProjectModal(projectId) {
-    const data = PROJECTS[projectId];
+    const data = PROJECTS[projectId] || (window.PF?.dyn || {})[projectId];
     if (!data) return;
 
     // Populate text
     modalTitle.textContent = data.title;
     modalKicker.textContent = data.kicker;
     modalDesc.textContent = data.description;
-    modalSpecs.innerHTML = data.specs.map(s => `<div class="modal-spec">${s}</div>`).join('');
-    modalTags.innerHTML = data.tags.map(t => `<span>${t}</span>`).join('');
+    modalSpecs.innerHTML = data.specs.map(s => `<div class="modal-spec">${esc(s)}</div>`).join('');
+    modalTags.innerHTML = data.tags.map(t => `<span>${esc(t)}</span>`).join('');
 
     // Show modal
     modal.hidden = false;
@@ -502,16 +505,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = 'hidden';
 
     // Build modal 3D scene after layout so canvas has dimensions
-    requestAnimationFrame(() => {
-      if (modalCleanup) { modalCleanup(); modalCleanup = null; }
-      modalCleanup = makeModalScene(modalCanvas, data.model);
-    });
+    requestAnimationFrame(() => startModalViewer(data));
   }
 
   function closeProjectModal() {
     if (!modalOpen) return;
     modal.classList.remove('open');
-    modalOpen = false;
+    modalOpen = false; modalTok++;
     document.body.style.overflow = '';
     setTimeout(() => {
       modal.hidden = true;
@@ -519,7 +519,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 280);
   }
 
-  function makeModalScene(canvas, type) {
+  // Sample projects -> procedural model; admin projects -> GLB streamed from the database (or cover image)
+  async function startModalViewer(data) {
+    const tok = ++modalTok;
+    if (modalCleanup) { modalCleanup(); modalCleanup = null; }
+    const load = $('#modalLoad'), cover = $('#modalCover'), tools = $('#viewerTools'), dims = $('#viewerDims');
+    cover.hidden = load.hidden = tools.hidden = dims.hidden = true;
+    modalCanvas.style.visibility = 'visible';
+    $$('[data-v]', tools).forEach(b => b.classList.toggle('on', b.dataset.v === 'spin' && !reduced));
+    if (data.modelId) {
+      load.hidden = false; $('span', load).textContent = 'LOADING MODEL…'; load.style.setProperty('--p', 0);
+      try {
+        const buf = await window.PF.fetchModel(data.modelId, p => load.style.setProperty('--p', p));
+        const obj = await parseGLB(buf);
+        if (tok !== modalTok || !modalOpen) return;
+        const { group, dims: d } = fit(obj);
+        modalCleanup = makeModalScene(modalCanvas, null, group);
+        tools.hidden = dims.hidden = false;
+        dims.textContent = `BBOX  ${d.x.toFixed(2)} × ${d.y.toFixed(2)} × ${d.z.toFixed(2)}  (model units)`;
+      } catch (err) { console.warn(err); if (tok === modalTok) $('span', load).textContent = 'Could not load the 3D model'; return; }
+      load.hidden = true;
+    } else if (data.cover) {
+      modalCanvas.style.visibility = 'hidden'; cover.src = data.cover; cover.hidden = false;
+    } else if (data.model) {
+      modalCleanup = makeModalScene(modalCanvas, data.model);
+    }
+  }
+
+  $('#viewerTools')?.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b || !modalApi) return;
+    const a = modalApi, v = b.dataset.v;
+    if (v === 'wire') { b.classList.toggle('on'); a.model.traverse(o => { if (o.isMesh) [].concat(o.material).forEach(m => { m.wireframe = b.classList.contains('on'); }); }); }
+    if (v === 'box') { b.classList.toggle('on'); if (!a.box) { a.box = new THREE.BoxHelper(a.model, 0xffb454); a.scene.add(a.box); } a.box.visible = b.classList.contains('on'); }
+    if (v === 'spin') { b.classList.toggle('on'); a.controls.autoRotate = b.classList.contains('on'); }
+    if (v === 'reset') { a.camera.position.copy(a.home); a.controls.target.set(0, 0, 0); a.controls.update(); }
+  });
+
+  function makeModalScene(canvas, type, custom) {
     if (!canvas) return null;
 
     const scene = new THREE.Scene();
@@ -560,7 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const grid = new THREE.GridHelper(14, 28, 0x3c5a78, 0x22384f);
     grid.position.y = -1.005; scene.add(grid);
 
-    const model = buildModel(type, false);
+    const model = custom || buildModel(type, false);
     scene.add(model);
 
     const controls = new OrbitControls(camera, canvas);
@@ -573,6 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
     controls.autoRotate = !reduced;
     controls.autoRotateSpeed = 1.1;
     controls.update();
+    modalApi = { scene, camera, controls, model, home: camera.position.clone(), box: null };
 
     const resize = () => {
       const w = canvas.clientWidth, h = canvas.clientHeight;
@@ -592,7 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     render();
 
-    return () => { cancelAnimationFrame(frame); ro.disconnect(); controls.dispose(); renderer.dispose(); };
+    return () => { cancelAnimationFrame(frame); ro.disconnect(); controls.dispose(); if (custom) disposeObject(custom); modalApi = null; renderer.dispose(); };
   }
 
   // Card click handlers
@@ -603,42 +640,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  window.PF = window.PF || {}; window.PF.open = openProjectModal;
   modalClose?.addEventListener('click', closeProjectModal);
   modalBackdrop?.addEventListener('click', closeProjectModal);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeProjectModal(); });
-
-  /* ============================================================
-     UPLOAD ZONE
-     ============================================================ */
-  const zone = $('#uploadZone'), input = $('#fileInput'), preview = $('#uploadPreview');
-  $('#browseBtn')?.addEventListener('click', () => input?.click());
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(n =>
-    zone?.addEventListener(n, e => { e.preventDefault(); e.stopPropagation(); }));
-  ['dragenter', 'dragover'].forEach(n => zone?.addEventListener(n, () => zone.classList.add('dragover')));
-  ['dragleave', 'drop'].forEach(n => zone?.addEventListener(n, () => zone.classList.remove('dragover')));
-  zone?.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
-  input?.addEventListener('change', () => handleFiles(input.files));
-
-  function handleFiles(files) {
-    [...(files || [])].filter(f => f.type.startsWith('image/')).forEach(file => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const item = document.createElement('div');
-        item.className = 'preview-item';
-        const img = document.createElement('img');
-        img.src = reader.result; img.alt = file.name;
-        const remove = document.createElement('button');
-        remove.type = 'button'; remove.className = 'remove';
-        remove.textContent = '×';
-        remove.setAttribute('aria-label', 'Remove image');
-        remove.onclick = () => item.remove();
-        item.append(img, remove);
-        preview.append(item);
-      };
-      reader.readAsDataURL(file);
-    });
-    if (input) input.value = '';
-  }
 
   $('#contactForm')?.addEventListener('submit', e => {
     e.preventDefault();
