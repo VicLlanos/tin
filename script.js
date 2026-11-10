@@ -99,6 +99,142 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ============================================================
      PROCEDURAL MODELS (fallback when no GLB)
      ============================================================ */
+  // ---- Realistic carton conveyor (hero) ----
+  function conveyor(g) {
+    const beltY = -0.42;
+    const beltLen = 3.6;
+    const beltW = 1.05;
+
+    const shadow = new THREE.Mesh(
+      new THREE.PlaneGeometry(4.2, 1.8),
+      new THREE.MeshStandardMaterial({ color: '#d0d0cc', roughness: 1, transparent: true, opacity: 0.35 })
+    );
+    shadow.rotation.x = -Math.PI / 2;
+    shadow.position.y = -1.01;
+    g.add(shadow);
+
+    for (const z of [-beltW / 2 - 0.06, beltW / 2 + 0.06]) {
+      box(g, [beltLen + 0.15, 0.14, 0.07], [0, beltY - 0.18, z], M.frameMat);
+      box(g, [beltLen + 0.15, 0.08, 0.05], [0, beltY - 0.48, z], M.dark);
+    }
+
+    for (const x of [-1.55, 0, 1.55]) {
+      for (const z of [-0.58, 0.58]) {
+        box(g, [0.09, 0.72, 0.09], [x, -0.95, z], M.frameMat);
+        box(g, [0.22, 0.04, 0.22], [x, -1.28, z], M.dark);
+        cyl(g, 0.025, 0.025, 0.06, [x, -1.24, z], M.steel, 8);
+      }
+    }
+
+    for (const x of [-1.2, -0.4, 0.4, 1.2]) {
+      box(g, [0.06, 0.06, beltW + 0.2], [x, beltY - 0.28, 0], M.dark);
+    }
+
+    box(g, [beltLen - 0.15, 0.04, beltW - 0.08], [0, beltY - 0.08, 0], M.cast);
+    const beltTop = box(g, [beltLen - 0.1, 0.025, beltW - 0.12], [0, beltY, 0], M.beltMat);
+    beltTop.name = 'belt';
+    box(g, [beltLen - 0.2, 0.02, beltW - 0.2], [0, beltY - 0.38, 0], M.beltMat);
+
+    for (let i = 0; i < 11; i++) {
+      const cleat = box(g, [0.04, 0.018, beltW - 0.18], [-1.55 + i * 0.32, beltY + 0.02, 0], M.gold);
+      cleat.name = 'stripe';
+    }
+
+    for (const x of [-beltLen / 2 + 0.08, beltLen / 2 - 0.08]) {
+      cyl(g, 0.11, 0.11, beltW - 0.05, [x, beltY - 0.02, 0], M.rollerMat, 32, [Math.PI / 2, 0, 0]);
+      cyl(g, 0.035, 0.035, beltW + 0.28, [x, beltY - 0.02, 0], M.steel, 12, [Math.PI / 2, 0, 0]);
+      for (const z of [-(beltW / 2 + 0.12), beltW / 2 + 0.12]) {
+        box(g, [0.16, 0.16, 0.1], [x, beltY - 0.02, z], M.dark);
+        cyl(g, 0.04, 0.04, 0.04, [x, beltY - 0.02, z + (z > 0 ? 0.06 : -0.06)], M.steel, 10, [Math.PI / 2, 0, 0]);
+      }
+    }
+
+    cyl(g, 0.07, 0.07, beltW - 0.25, [1.35, beltY - 0.32, 0], M.rollerMat, 20, [Math.PI / 2, 0, 0]);
+
+    box(g, [0.5, 0.32, 0.36], [1.55, -0.95, 0.72], M.frameMat);
+    for (let i = 0; i < 5; i++) {
+      box(g, [0.48, 0.28, 0.015], [1.55, -0.95, 0.55 + i * 0.035], M.dark);
+    }
+    box(g, [0.28, 0.28, 0.28], [1.55, -0.72, 0.42], M.dark);
+    cyl(g, 0.03, 0.03, 0.35, [1.55, beltY - 0.02, 0.28], M.steel, 10, [Math.PI / 2, 0, 0]);
+    box(g, [0.14, 0.12, 0.1], [1.75, -0.88, 0.72], M.cast);
+
+    for (const z of [-beltW / 2 + 0.02, beltW / 2 - 0.02]) {
+      box(g, [beltLen - 0.3, 0.12, 0.03], [0, beltY + 0.12, z], M.steel);
+      for (const x of [-1.3, 0, 1.3]) {
+        box(g, [0.04, 0.2, 0.04], [x, beltY + 0.02, z], M.dark);
+      }
+    }
+
+    box(g, [beltLen - 0.4, 0.03, 0.03], [0, beltY + 0.28, -beltW / 2 - 0.08], M.gold);
+
+    // Carton
+    const carton = new THREE.Group();
+    carton.name = 'carton';
+    const bw = 0.52, bh = 0.42, bd = 0.44;
+
+    const body = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, bd), M.cardboard);
+    body.position.y = bh / 2;
+    body.castShadow = body.receiveShadow = true;
+    carton.add(body);
+
+    const bottom = new THREE.Mesh(new THREE.BoxGeometry(bw - 0.01, 0.02, bd - 0.01), M.cardboardDark);
+    bottom.position.y = 0.01;
+    carton.add(bottom);
+
+    const top = new THREE.Mesh(new THREE.BoxGeometry(bw + 0.01, 0.025, bd + 0.01), M.cardboard);
+    top.position.y = bh + 0.01;
+    top.castShadow = true;
+    carton.add(top);
+
+    const tapeMat = new THREE.MeshStandardMaterial({ color: '#e8e0c8', metalness: 0.1, roughness: 0.55 });
+    const tape = new THREE.Mesh(new THREE.BoxGeometry(bw + 0.02, 0.02, 0.06), tapeMat);
+    tape.position.y = bh + 0.025;
+    carton.add(tape);
+    const tapeSide = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.02, bd + 0.02), tapeMat);
+    tapeSide.position.y = bh + 0.025;
+    carton.add(tapeSide);
+
+    const label = new THREE.Mesh(
+      new THREE.BoxGeometry(0.28, 0.2, 0.008),
+      new THREE.MeshStandardMaterial({ color: '#f5f5f0', roughness: 0.7 })
+    );
+    label.position.set(0.02, bh * 0.55, bd / 2 + 0.002);
+    carton.add(label);
+
+    for (let i = 0; i < 8; i++) {
+      const bar = new THREE.Mesh(
+        new THREE.BoxGeometry(0.012 + (i % 3) * 0.008, 0.1, 0.006),
+        new THREE.MeshStandardMaterial({ color: '#1a1a1a', roughness: 0.9 })
+      );
+      bar.position.set(-0.08 + i * 0.028, bh * 0.5, bd / 2 + 0.006);
+      carton.add(bar);
+    }
+
+    for (const sx of [-1, 1]) {
+      for (const sz of [-1, 1]) {
+        const edge = new THREE.Mesh(new THREE.BoxGeometry(0.03, bh - 0.04, 0.03), M.cardboardDark);
+        edge.position.set(sx * (bw / 2 - 0.01), bh / 2, sz * (bd / 2 - 0.01));
+        carton.add(edge);
+      }
+    }
+
+    for (const z of [-1, 1]) {
+      const slot = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.06, 0.02), M.cardboardDark);
+      slot.position.set(0, bh * 0.65, z * (bd / 2 + 0.005));
+      carton.add(slot);
+    }
+
+    carton.position.set(-1.2, beltY + 0.012, 0);
+    g.add(carton);
+
+    const carton2 = carton.clone(true);
+    carton2.name = 'carton2';
+    carton2.position.set(0.6, beltY + 0.012, 0);
+    carton2.scale.setScalar(0.92);
+    g.add(carton2);
+  }
+
   function vise(g, exploded = false) {
     box(g, [2.65, 0.28, 1.65], [0, -0.82, 0], M.cast);
     box(g, [2.35, 0.12, 1.42], [0, -0.63, 0], M.dark);
@@ -273,6 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function buildModel(type, explodedFlag = false) {
     const g = new THREE.Group();
     switch (type) {
+      case 'conveyor': conveyor(g); break;
       case 'vise':     vise(g, explodedFlag); break;
       case 'assembly': bracketAssembly(g); break;
       case 'housing':  housing(g); break;
@@ -376,12 +513,17 @@ document.addEventListener('DOMContentLoaded', () => {
       controls = new OrbitControls(camera, canvas);
       controls.enableDamping = true;
       controls.dampingFactor = 0.055;
-      controls.minDistance = 3.5;
-      controls.maxDistance = 9;
+      controls.minDistance = 3.2;
+      controls.maxDistance = 10;
       controls.maxPolarAngle = Math.PI * 0.49;
-      controls.target.set(0, 0, 0);
+      controls.target.set(0, -0.35, 0);
       controls.autoRotate = !reduced;
-      controls.autoRotateSpeed = 0.7;
+      controls.autoRotateSpeed = 0.55;
+      if (typeOrUrl === 'conveyor') {
+        camera.position.set(4.2, 2.6, 4.8);
+        controls.target.set(0, -0.45, 0);
+        controls.update();
+      }
     } else {
       camera.position.set(4.2, 2.8, 5.2);
       if (['template', 'nesting', 'drawing'].includes(typeOrUrl)) {
@@ -403,11 +545,37 @@ document.addEventListener('DOMContentLoaded', () => {
     resize();
 
     let frame;
+    let cartonT = 0;
+    const carton = !isUrl ? model.getObjectByName('carton') : null;
+    const carton2 = !isUrl ? model.getObjectByName('carton2') : null;
+    const stripes = [];
+    if (!isUrl) model.traverse(o => { if (o.name === 'stripe') stripes.push(o); });
+    const beltSpan = 3.2;
+    const beltHalf = beltSpan / 2;
     const render = () => {
       frame = requestAnimationFrame(render);
       controls?.update();
       if (!hero && !reduced && !isUrl && ['housing', 'assembly'].includes(typeOrUrl)) {
         model.rotation.y += 0.0025;
+      }
+      if (!reduced && typeOrUrl === 'conveyor') {
+        cartonT += 0.011;
+        const place = (obj, phase) => {
+          if (!obj) return;
+          let x = ((cartonT + phase) % beltSpan) - beltHalf;
+          obj.position.x = x;
+          obj.position.y = -0.408;
+          obj.position.z = Math.sin((cartonT + phase) * 6) * 0.004;
+          obj.rotation.z = Math.sin((cartonT + phase) * 5) * 0.012;
+          obj.rotation.x = Math.sin((cartonT + phase) * 3.5) * 0.006;
+        };
+        place(carton, 0);
+        place(carton2, beltSpan * 0.48);
+        stripes.forEach((s, i) => {
+          let sx = -1.55 + i * 0.32 + cartonT * 0.42;
+          sx = ((sx + beltHalf) % beltSpan) - beltHalf;
+          s.position.x = sx;
+        });
       }
       renderer.render(scene, camera);
     };
@@ -423,7 +591,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- HERO + DEFAULT PROJECT PREVIEWS ---------- */
   const cleanup = [];
-  const heroCleanup = makeScene($('#heroModel'), 'vise', true);
+  const heroCleanup = makeScene($('#heroModel'), 'conveyor', true);
   if (heroCleanup) cleanup.push(heroCleanup);
 
   // Fallback project cards if Firebase is empty
