@@ -1124,12 +1124,14 @@ document.addEventListener('DOMContentLoaded', () => {
     throw new Error('Unknown file kind');
   }
 
-  projectFormprojectForm?.addEventListener('submit', async (e) => {
+  projectForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    e.stopPropagation();
     const errEl = $('#projectError');
     const prog = $('#projectProgress');
     const fill = $('#projectProgressFill');
     const progText = $('#projectProgressText');
+    const saveBtn = projectForm.querySelector('button[type="submit"]');
     errEl.hidden = true;
     prog.hidden = true;
 
@@ -1137,6 +1139,11 @@ document.addEventListener('DOMContentLoaded', () => {
       errEl.textContent = 'You are not signed in. Close Admin, open it again, and sign in.';
       errEl.hidden = false;
       return;
+    }
+
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving…';
     }
 
     const id = $('#projectId').value;
@@ -1228,11 +1235,31 @@ document.addEventListener('DOMContentLoaded', () => {
       renderMediaPreview('#pImagesPreview', [], 'image');
       renderMediaPreview('#pPdfsPreview', [], 'pdf');
       prog.hidden = true;
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Project';
+      }
+      // Stay on Admin — confirm save
+      const note = document.createElement('p');
+      note.className = 'form-hint';
+      note.style.color = '#1a7f37';
+      note.style.marginTop = '12px';
+      note.textContent = 'Project saved. It should appear in the gallery immediately.';
+      $('#adminProjectsList')?.parentElement?.insertBefore(note, $('#adminProjectsList'));
+      setTimeout(() => note.remove(), 4000);
     } catch (err) {
       console.error(err);
-      errEl.textContent = err.message || 'Save failed. Check Realtime Database rules and that you are signed in.';
+      let msg = err.message || 'Save failed.';
+      if (String(err.message || err.code || '').includes('PERMISSION_DENIED') || err.code === 'PERMISSION_DENIED') {
+        msg = 'Permission denied. Publish Realtime Database rules so authenticated users can write to /projects (see firebase-rules.md).';
+      }
+      errEl.textContent = msg;
       errEl.hidden = false;
       prog.hidden = true;
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Project';
+      }
     }
   });
 
