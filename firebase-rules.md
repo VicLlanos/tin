@@ -1,89 +1,45 @@
-# Firebase Console Setup (Required)
+# Firebase free-tier setup (Realtime Database only — no Storage)
 
-## 1. Enable Authentication
-Firebase Console → Authentication → Sign-in method → Email/Password → Enable
+This portfolio uses **only**:
+- Firebase **Authentication** (email/password)
+- Firebase **Realtime Database**
 
-Create your admin user:
-Authentication → Users → Add user
-(email + password you will use to log in)
+Images, PDFs, and small GLBs are compressed and stored **inside RTDB** as data URLs.  
+No Firebase Storage, no paid plan required (Spark / free tier).
 
-## 2. Enable Storage
-Firebase Console → Storage → Get started → Start in production mode
-(then update rules below)
+## 1. Authentication
+Console → Authentication → Sign-in method → **Email/Password** → Enable  
 
-## 3. Realtime Database Rules
-Replace your current rules with:
+Create an account from the site Admin → **Create Account**, or add a user in the Console.
+
+## 2. Realtime Database rules
+Console → Realtime Database → Rules:
 
 ```json
 {
   "rules": {
     ".read": true,
-    "experiences": {
-      ".write": "auth != null"
-    },
-    "certifications": {
-      ".write": "auth != null"
-    },
-    "projects": {
-      ".write": "auth != null"
-    },
-    "settings": {
-      ".write": "auth != null"
-    }
+    "experiences": { ".write": "auth != null" },
+    "certifications": { ".write": "auth != null" },
+    "projects": { ".write": "auth != null" },
+    "settings": { ".write": "auth != null" }
   }
 }
 ```
 
-Public visitors can read everything. Only signed-in admins can write.
+## 3. Size limits (free-tier friendly)
+| Asset | Limit | Notes |
+|-------|--------|--------|
+| Cover / gallery images | ~450 KB after auto-compress | Resized to max 1200px, JPEG |
+| PDF | ~700 KB each | Keep drawings simple / compressed |
+| GLB | ~800 KB | Optional; hero still has built-in model |
+| RTDB total (Spark) | 1 GB stored | Plenty for a portfolio |
 
-## 4. Storage Rules
-Firebase Console → Storage → Rules:
+## 4. Do **not** enable Storage
+This app does not call Storage. You can ignore Storage entirely.
 
-```
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    match /models/{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null
-                   && request.resource.size < 50 * 1024 * 1024
-                   && request.resource.contentType.matches('model/.*|application/octet-stream');
-    }
-    match /thumbnails/{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null
-                   && request.resource.size < 8 * 1024 * 1024
-                   && request.resource.contentType.matches('image/.*');
-    }
-    match /images/{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null
-                   && request.resource.size < 12 * 1024 * 1024
-                   && request.resource.contentType.matches('image/.*');
-    }
-    match /pdfs/{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null
-                   && request.resource.size < 30 * 1024 * 1024
-                   && request.resource.contentType.matches('application/pdf');
-    }
-  }
-}
-```
-
-## 5. Database URL
-Already wired in script.js:
-https://tine-54a9e-default-rtdb.asia-southeast1.firebasedatabase.app/
-
-## What gets stored where
-
-| Content | Storage path | RTDB field |
-|---------|--------------|------------|
-| GLB 3D model | `/models/` | `projects/{id}.modelUrl` |
-| Cover image | `/thumbnails/` | `projects/{id}.thumbnailUrl` |
-| Gallery images | `/images/` | `projects/{id}.images[]` |
-| PDF documents | `/pdfs/` | `projects/{id}.pdfs[{name,url}]` |
-| Experience | — | `/experiences/` |
-| Certifications | — | `/certifications/` |
-
-After setup: open the site → footer **Admin** → sign in → add projects with images/PDFs/GLB. The public gallery updates in real time.
+## 5. If save fails
+- Confirm you are signed in (Admin dashboard visible)
+- Confirm RTDB rules above are published
+- Check file sizes against the limits
+- Large photos are auto-compressed; very large PDFs must be reduced first

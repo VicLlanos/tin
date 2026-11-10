@@ -16,8 +16,7 @@
         "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
         "firebase/app": "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js",
         "firebase/auth": "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js",
-        "firebase/database": "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js",
-        "firebase/storage": "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js"
+        "firebase/database": "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js"
       }
     }
   </script>
@@ -418,24 +417,24 @@
               <div class="form-group">
                 <label>GLB Model File</label>
                 <input type="file" id="pGlb" accept=".glb,.gltf,model/gltf-binary">
-                <p class="form-hint">Optional 3D model. Max ~50 MB. Kept if empty on edit.</p>
+                <p class="form-hint">Optional small GLB (max ~800 KB). Stored in database. Kept if empty on edit.</p>
               </div>
               <div class="form-group">
                 <label>Cover / Thumbnail Image</label>
                 <input type="file" id="pThumb" accept="image/*">
-                <p class="form-hint">Main card image. Kept if empty on edit.</p>
+                <p class="form-hint">Main card image (auto-compressed, max ~1200px). Kept if empty on edit.</p>
               </div>
             </div>
             <div class="form-group">
               <label>Gallery Images</label>
               <input type="file" id="pImages" accept="image/*" multiple>
-              <p class="form-hint">Multiple images. Added to existing gallery on edit.</p>
+              <p class="form-hint">Multiple images (auto-compressed). Added to existing gallery on edit.</p>
               <div class="admin-media-preview" id="pImagesPreview"></div>
             </div>
             <div class="form-group">
               <label>PDF Documents</label>
               <input type="file" id="pPdfs" accept="application/pdf,.pdf" multiple>
-              <p class="form-hint">Drawings, datasheets, reports. Added to existing list on edit.</p>
+              <p class="form-hint">PDF max ~700 KB each (free-tier limit). Added to existing list on edit.</p>
               <div class="admin-media-preview" id="pPdfsPreview"></div>
             </div>
             <div class="form-group">

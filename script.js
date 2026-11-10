@@ -4,7 +4,6 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import { getDatabase, ref, onValue, set, push, remove, update } from 'firebase/database';
-import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 /* ============================================================
    FIREBASE
@@ -23,7 +22,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
-const storage = getStorage(app);
 
 document.addEventListener('DOMContentLoaded', () => {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -292,6 +290,26 @@ document.addEventListener('DOMContentLoaded', () => {
      ============================================================ */
   const gltfLoader = new GLTFLoader();
 
+  function modelSrcForLoader(src) {
+    if (!src || typeof src !== 'string') return src;
+    if (src.startsWith('data:') && (src.includes('octet-stream') || src.includes('gltf') || src.includes('model/'))) {
+      // Convert data URL to blob URL for more reliable GLTFLoader parsing
+      try {
+        const [header, b64] = src.split(',');
+        const mime = (header.match(/data:([^;]+)/) || [])[1] || 'model/gltf-binary';
+        const bin = atob(b64);
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        return URL.createObjectURL(new Blob([bytes], { type: mime }));
+      } catch (e) {
+        console.warn('data URL to blob failed', e);
+        return src;
+      }
+    }
+    return src;
+  }
+
+
   function makeScene(canvas, typeOrUrl, hero = false) {
     if (!canvas) return null;
     const scene = new THREE.Scene();
@@ -326,9 +344,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let model = new THREE.Group();
     scene.add(model);
 
-    const isUrl = typeof typeOrUrl === 'string' && (typeOrUrl.startsWith('http') || typeOrUrl.endsWith('.glb') || typeOrUrl.endsWith('.gltf'));
+    const isUrl = typeof typeOrUrl === 'string' && (typeOrUrl.startsWith('http') || typeOrUrl.startsWith('data:') || typeOrUrl.endsWith('.glb') || typeOrUrl.endsWith('.gltf'));
     if (isUrl) {
-      gltfLoader.load(typeOrUrl, (gltf) => {
+      gltfLoader.load(modelSrcForLoader(typeOrUrl), (gltf) => {
         scene.remove(model);
         model = gltf.scene;
         // Center & scale
@@ -617,9 +635,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let model = new THREE.Group();
     scene.add(model);
 
-    const isUrl = typeof typeOrUrl === 'string' && (typeOrUrl.startsWith('http') || typeOrUrl.includes('.glb') || typeOrUrl.includes('.gltf'));
+    const isUrl = typeof typeOrUrl === 'string' && (typeOrUrl.startsWith('http') || typeOrUrl.startsWith('data:') || typeOrUrl.includes('.glb') || typeOrUrl.includes('.gltf'));
     if (isUrl) {
-      gltfLoader.load(typeOrUrl, (gltf) => {
+      gltfLoader.load(modelSrcForLoader(typeOrUrl), (gltf) => {
         scene.remove(model);
         model = gltf.scene;
         const box3 = new THREE.Box3().setFromObject(model);
@@ -1020,25 +1038,93 @@ document.addEventListener('DOMContentLoaded', () => {
     if ($('#pPdfs')) $('#pPdfs').value = '';
   }
 
-  async function uploadFile(file, path, onProgress) {
-    const sRef = storageRef(storage, path);
-    const task = uploadBytesResumable(sRef, file);
+  /* ----- Free-tier: store files as data URLs in RTDB (no Storage) ----- */
+  const LIMITS = {
+    imageMaxEdge: 1200,
+    imageMaxBytes: 450_000,   // ~450 KB data URL budget per image
+    pdfMaxBytes: 700_000,     // ~700 KB raw PDF
+    glbMaxBytes: 800_000,     // ~800 KB GLB
+  };
+
+  function readAsDataURL(file) {
     return new Promise((resolve, reject) => {
-      task.on('state_changed',
-        (snap) => {
-          const pct = (snap.bytesTransferred / snap.totalBytes) * 100;
-          onProgress?.(pct);
-        },
-        reject,
-        async () => {
-          const url = await getDownloadURL(task.snapshot.ref);
-          resolve(url);
-        }
-      );
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('Could not read file: ' + file.name));
+      reader.readAsDataURL(file);
     });
   }
 
-  projectForm?.addEventListener('submit', async (e) => {
+  function compressImageFile(file, onProgress) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        let { width, height } = img;
+        const maxEdge = LIMITS.imageMaxEdge;
+        if (width > maxEdge || height > maxEdge) {
+          const scale = maxEdge / Math.max(width, height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        let quality = 0.85;
+        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+        // Reduce quality until under budget
+        while (dataUrl.length > LIMITS.imageMaxBytes && quality > 0.4) {
+          quality -= 0.1;
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+        }
+        if (dataUrl.length > LIMITS.imageMaxBytes * 1.15) {
+          reject(new Error(`Image "${file.name}" is still too large after compression. Try a smaller photo.`));
+          return;
+        }
+        onProgress?.(100);
+        resolve(dataUrl);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('Could not load image: ' + file.name));
+      };
+      onProgress?.(20);
+      img.src = url;
+    });
+  }
+
+  async function fileToStoredPayload(file, kind, onProgress) {
+    if (kind === 'image') {
+      return compressImageFile(file, onProgress);
+    }
+    if (kind === 'pdf') {
+      if (file.size > LIMITS.pdfMaxBytes) {
+        throw new Error(`PDF "${file.name}" is ${Math.round(file.size/1024)} KB. Max is ${Math.round(LIMITS.pdfMaxBytes/1024)} KB on free tier.`);
+      }
+      onProgress?.(30);
+      const dataUrl = await readAsDataURL(file);
+      onProgress?.(100);
+      return { name: file.name, url: dataUrl };
+    }
+    if (kind === 'glb') {
+      if (file.size > LIMITS.glbMaxBytes) {
+        throw new Error(`GLB "${file.name}" is ${Math.round(file.size/1024)} KB. Max is ${Math.round(LIMITS.glbMaxBytes/1024)} KB on free tier (or skip GLB and use the built-in viewer models).`);
+      }
+      onProgress?.(30);
+      const dataUrl = await readAsDataURL(file);
+      onProgress?.(100);
+      return dataUrl;
+    }
+    throw new Error('Unknown file kind');
+  }
+
+  projectFormprojectForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const errEl = $('#projectError');
     const prog = $('#projectProgress');
@@ -1046,6 +1132,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const progText = $('#projectProgressText');
     errEl.hidden = true;
     prog.hidden = true;
+
+    if (!auth.currentUser) {
+      errEl.textContent = 'You are not signed in. Close Admin, open it again, and sign in.';
+      errEl.hidden = false;
+      return;
+    }
 
     const id = $('#projectId').value;
     const title = $('#pTitle').value.trim();
@@ -1076,10 +1168,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const hasUploads = glbFile || thumbFile || imageFiles.length || pdfFiles.length;
       if (hasUploads) {
         prog.hidden = false;
-        fill.style.width = '0%';
+        fill.style.width = '2%';
+        progText.textContent = 'Processing files…';
       }
 
-      const totalSteps = (glbFile ? 1 : 0) + (thumbFile ? 1 : 0) + imageFiles.length + pdfFiles.length || 1;
+      const totalSteps = Math.max(1, (glbFile ? 1 : 0) + (thumbFile ? 1 : 0) + imageFiles.length + pdfFiles.length);
       let doneSteps = 0;
       const bump = (label, pctInStep) => {
         const overall = ((doneSteps + pctInStep / 100) / totalSteps) * 100;
@@ -1088,33 +1181,29 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       if (glbFile) {
-        const path = `models/${Date.now()}_${glbFile.name.replace(/[^\w.\-]/g, '_')}`;
-        modelUrl = await uploadFile(glbFile, path, (pct) => bump('Uploading GLB…', pct));
+        modelUrl = await fileToStoredPayload(glbFile, 'glb', (pct) => bump('Reading GLB…', pct));
         doneSteps++;
       }
 
       if (thumbFile) {
-        const path = `thumbnails/${Date.now()}_${thumbFile.name.replace(/[^\w.\-]/g, '_')}`;
-        thumbnailUrl = await uploadFile(thumbFile, path, (pct) => bump('Uploading cover…', pct));
+        thumbnailUrl = await fileToStoredPayload(thumbFile, 'image', (pct) => bump('Compressing cover…', pct));
         doneSteps++;
       }
 
       for (const file of imageFiles) {
-        const path = `images/${Date.now()}_${file.name.replace(/[^\w.\-]/g, '_')}`;
-        const url = await uploadFile(file, path, (pct) => bump(`Uploading image ${doneSteps + 1}…`, pct));
+        const url = await fileToStoredPayload(file, 'image', (pct) => bump(`Compressing image…`, pct));
         images.push(url);
         doneSteps++;
       }
 
       for (const file of pdfFiles) {
-        const path = `pdfs/${Date.now()}_${file.name.replace(/[^\w.\-]/g, '_')}`;
-        const url = await uploadFile(file, path, (pct) => bump(`Uploading PDF…`, pct));
-        pdfs.push({ name: file.name, url });
+        const payload = await fileToStoredPayload(file, 'pdf', (pct) => bump('Reading PDF…', pct));
+        pdfs.push(payload);
         doneSteps++;
       }
 
       fill.style.width = '100%';
-      progText.textContent = 'Saving…';
+      progText.textContent = 'Saving to database…';
 
       const data = {
         title, category, description, tags, specs, order,
@@ -1141,7 +1230,7 @@ document.addEventListener('DOMContentLoaded', () => {
       prog.hidden = true;
     } catch (err) {
       console.error(err);
-      errEl.textContent = err.message || 'Save failed. Check Storage rules and Auth.';
+      errEl.textContent = err.message || 'Save failed. Check Realtime Database rules and that you are signed in.';
       errEl.hidden = false;
       prog.hidden = true;
     }
