@@ -409,22 +409,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (heroCleanup) cleanup.push(heroCleanup);
 
   // Fallback project cards if Firebase is empty
-  const FALLBACK_PROJECTS = [
-    { id: 'fb-housing', title: 'Packaging Component Set', category: 'product', description: 'Modular product housing designed for efficient assembly and material optimization.', tags: ['SolidWorks', 'DFM'], model: 'housing', kicker: 'PRODUCT · DFM',
-      specs: ['Dimensions: 250 × 165 × 125 mm', 'Material: Glass-filled nylon (PA66-GF30)', 'Process: Injection moulding', 'Tolerance: ±0.15 mm on mating surfaces'] },
-    { id: 'fb-template', title: 'Production Template Pack', category: 'template', description: 'Precision templates and patterns for consistent manufacturing output at scale.', tags: ['AutoCAD', 'Templating'], model: 'template', kicker: 'TEMPLATE · PRECISION',
-      specs: ['Dimensions: 300 × 170 × 12 mm', 'Material: 6082-T6 aluminium', 'Process: CNC milling', 'Flatness: 0.05 mm'] },
-    { id: 'fb-drawing', title: 'Detailed Part Drawing', category: 'drawing', description: 'Full production drawings with dimensions, tolerances, and clear callouts.', tags: ['AutoCAD', 'GD&T'], model: 'drawing', kicker: 'DRAWING · GD&T',
-      specs: ['Sheet size: A2', 'Standards: ISO 2768-mK, ASME Y14.5', 'Views: Front, top, right, isometric', 'Tolerances: ±0.1 mm general'] },
-    { id: 'fb-assembly', title: 'Multi-Part Assembly', category: 'assembly', description: 'Complex assembly modeling with clear mate relationships and motion studies.', tags: ['SolidWorks', 'Assembly'], model: 'assembly', kicker: 'ASSEMBLY · MOTION',
-      specs: ['Parts: 14 unique components', 'Materials: Steel, aluminium, bronze', 'Motion: 120 mm carriage travel', 'Mates: Concentric, coincident, limit'] },
-    { id: 'fb-exploded', title: 'Exploded View Package', category: 'drawing', description: 'Exploded assembly drawings with item balloons and parts list for production.', tags: ['SolidWorks', 'Documentation'], model: 'exploded', kicker: 'DOCUMENTATION · EXPLODED',
-      specs: ['Format: A3 exploded isometric', 'Balloons: 4 item references', 'Parts list: 8 line items', 'Standards: ASME Y14.34'] },
-    { id: 'fb-nesting', title: 'Nesting Template Layout', category: 'template', description: 'Optimized nesting templates to maximize material yield and reduce waste.', tags: ['AutoCAD', 'Templating'], model: 'nesting', kicker: 'TEMPLATE · NESTING',
-      specs: ['Sheet size: 320 × 200 mm', 'Parts nested: 9 unique blanks', 'Material yield: 87%', 'Process: Laser cutting'] },
-  ];
+  const FALLBACK_PROJECTS = [];
 
-  let liveProjects = [...FALLBACK_PROJECTS];
+  let liveProjects = [];
 
   function renderGallery(projects) {
     const gallery = $('#gallery');
@@ -432,6 +419,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Clean previous procedural canvases
     cleanup.splice(1).forEach(fn => fn());
     gallery.innerHTML = '';
+
+    if (!projects.length) {
+      gallery.innerHTML = `<div class="gallery-empty" style="grid-column:1/-1;padding:48px 24px;text-align:center;border:1.5px dashed var(--border);border-radius:var(--radius);color:var(--text-dim);font-family:var(--mono);font-size:0.85rem;letter-spacing:0.04em;">
+        No projects yet — upload work from Admin to populate this gallery.
+      </div>`;
+      return;
+    }
 
     projects.forEach((p, i) => {
       const article = document.createElement('article');
@@ -762,12 +756,12 @@ document.addEventListener('DOMContentLoaded', () => {
         kicker: p.kicker || (p.category || 'PROJECT').toUpperCase(),
       }));
     } else {
-      liveProjects = [...FALLBACK_PROJECTS];
+      liveProjects = [];
     }
     renderGallery(liveProjects);
   });
 
-  // Initial render with fallbacks
+  // Start empty — projects appear when uploaded via Admin
   renderGallery(liveProjects);
 
   /* ============================================================
