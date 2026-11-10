@@ -52,18 +52,38 @@ service firebase.storage {
     match /thumbnails/{allPaths=**} {
       allow read: if true;
       allow write: if request.auth != null
-                   && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.size < 8 * 1024 * 1024
                    && request.resource.contentType.matches('image/.*');
+    }
+    match /images/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.resource.size < 12 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+    match /pdfs/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.resource.size < 30 * 1024 * 1024
+                   && request.resource.contentType.matches('application/pdf');
     }
   }
 }
 ```
 
 ## 5. Database URL
-Already provided:
+Already wired in script.js:
 https://tine-54a9e-default-rtdb.asia-southeast1.firebasedatabase.app/
 
-## Notes
-- GLB files go to Storage under `/models/`
-- Project metadata (title, description, modelUrl, etc.) lives in RTDB under `/projects/`
-- After first deploy, open `/admin` (or click the hidden Admin link in the footer) and sign in.
+## What gets stored where
+
+| Content | Storage path | RTDB field |
+|---------|--------------|------------|
+| GLB 3D model | `/models/` | `projects/{id}.modelUrl` |
+| Cover image | `/thumbnails/` | `projects/{id}.thumbnailUrl` |
+| Gallery images | `/images/` | `projects/{id}.images[]` |
+| PDF documents | `/pdfs/` | `projects/{id}.pdfs[{name,url}]` |
+| Experience | — | `/experiences/` |
+| Certifications | — | `/certifications/` |
+
+After setup: open the site → footer **Admin** → sign in → add projects with images/PDFs/GLB. The public gallery updates in real time.

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import { getDatabase, ref, onValue, set, push, remove, update } from 'firebase/database';
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
@@ -295,8 +295,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function makeScene(canvas, typeOrUrl, hero = false) {
     if (!canvas) return null;
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(hero ? '#0c0c0c' : '#0a0a0a');
-    scene.fog = new THREE.Fog(scene.background, 9, 20);
+    scene.background = new THREE.Color(hero ? '#ecece8' : '#e8e8e4');
+    scene.fog = new THREE.Fog(scene.background, 12, 28);
 
     const camera = new THREE.PerspectiveCamera(hero ? 36 : 34, 1, 0.1, 100);
     camera.position.set(4.6, 3.1, 5.5);
@@ -307,20 +307,20 @@ document.addEventListener('DOMContentLoaded', () => {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = 1.0;
 
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x222222, 1.6));
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x888888, 1.4));
     const key = new THREE.DirectionalLight(0xffffff, 2.4);
     key.position.set(4, 7, 5); key.castShadow = true; scene.add(key);
-    const rim = new THREE.DirectionalLight(0xaaaaaa, 1.4);
+    const rim = new THREE.DirectionalLight(0xffffff, 1.0);
     rim.position.set(-5, 3, -4); scene.add(rim);
 
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(30, 30),
-      new THREE.MeshStandardMaterial({ color: '#111111', roughness: 0.8 })
+      new THREE.MeshStandardMaterial({ color: '#d8d8d4', roughness: 0.85 })
     );
     floor.rotation.x = -Math.PI / 2; floor.position.y = -1.02; floor.receiveShadow = true; scene.add(floor);
-    const grid = new THREE.GridHelper(12, 24, 0x444444, 0x222222);
+    const grid = new THREE.GridHelper(12, 24, 0x999999, 0xc8c8c4);
     grid.position.y = -1.005; scene.add(grid);
 
     let model = new THREE.Group();
@@ -488,9 +488,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalSpecs = $('#modalSpecs');
   const modalTags = $('#modalTags');
   const modalLoading = $('#modalLoading');
+  const modalGallery = $('#modalGallery');
+  const modalPdfs = $('#modalPdfs');
+  const lightbox = $('#lightbox');
+  const lightboxImg = $('#lightboxImg');
 
   let modalCleanup = null;
   let modalOpen = false;
+
+  function openLightbox(src) {
+    if (!lightbox || !lightboxImg) return;
+    lightboxImg.src = src;
+    lightbox.hidden = false;
+  }
+  function closeLightbox() {
+    if (!lightbox) return;
+    lightbox.hidden = true;
+    if (lightboxImg) lightboxImg.src = '';
+  }
+  $('#lightboxClose')?.addEventListener('click', (e) => { e.stopPropagation(); closeLightbox(); });
+  lightbox?.addEventListener('click', closeLightbox);
 
   function openProjectModal(data) {
     if (!data) return;
@@ -501,6 +518,43 @@ document.addEventListener('DOMContentLoaded', () => {
     modalSpecs.innerHTML = specs.map(s => `<div class="modal-spec">${s}</div>`).join('');
     const tags = data.tags || [];
     modalTags.innerHTML = tags.map(t => `<span>${t}</span>`).join('');
+
+    // Gallery images
+    const images = Array.isArray(data.images) ? data.images : [];
+    if (modalGallery) {
+      if (images.length) {
+        modalGallery.hidden = false;
+        modalGallery.innerHTML = images.map(url =>
+          `<img src="${url}" alt="Project image" loading="lazy">`
+        ).join('');
+        modalGallery.querySelectorAll('img').forEach(img => {
+          img.addEventListener('click', () => openLightbox(img.src));
+        });
+      } else {
+        modalGallery.hidden = true;
+        modalGallery.innerHTML = '';
+      }
+    }
+
+    // PDF documents
+    const pdfs = Array.isArray(data.pdfs) ? data.pdfs : [];
+    if (modalPdfs) {
+      if (pdfs.length) {
+        modalPdfs.hidden = false;
+        modalPdfs.innerHTML = pdfs.map(p => {
+          const name = typeof p === 'string' ? (p.split('/').pop() || 'Document.pdf') : (p.name || 'Document.pdf');
+          const url = typeof p === 'string' ? p : p.url;
+          return `<a class="modal-pdf-link" href="${url}" target="_blank" rel="noopener">
+            <span class="pdf-icon">PDF</span>
+            <span class="pdf-name">${name}</span>
+            <span class="pdf-action">OPEN ↗</span>
+          </a>`;
+        }).join('');
+      } else {
+        modalPdfs.hidden = true;
+        modalPdfs.innerHTML = '';
+      }
+    }
 
     modal.hidden = false;
     requestAnimationFrame(() => modal.classList.add('open'));
@@ -519,6 +573,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function closeProjectModal() {
     if (!modalOpen) return;
+    closeLightbox();
     modal.classList.remove('open');
     modalOpen = false;
     document.body.style.overflow = '';
@@ -531,8 +586,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function makeModalScene(canvas, typeOrUrl) {
     if (!canvas) return null;
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#0a0a0a');
-    scene.fog = new THREE.Fog(scene.background, 10, 22);
+    scene.background = new THREE.Color('#e8e8e4');
+    scene.fog = new THREE.Fog(scene.background, 12, 28);
 
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
     const isoDist = 6.2;
@@ -549,20 +604,20 @@ document.addEventListener('DOMContentLoaded', () => {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMappingExposure = 1.05;
 
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x1a1a1a, 1.8));
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x999999, 1.5));
     const key = new THREE.DirectionalLight(0xffffff, 2.6);
     key.position.set(5, 8, 6); key.castShadow = true; scene.add(key);
-    const rim = new THREE.DirectionalLight(0xbbbbbb, 1.5);
+    const rim = new THREE.DirectionalLight(0xffffff, 1.1);
     rim.position.set(-6, 4, -5); scene.add(rim);
 
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(30, 30),
-      new THREE.MeshStandardMaterial({ color: '#0e0e0e', roughness: 0.8 })
+      new THREE.MeshStandardMaterial({ color: '#d8d8d4', roughness: 0.85 })
     );
     floor.rotation.x = -Math.PI / 2; floor.position.y = -1.02; floor.receiveShadow = true; scene.add(floor);
-    const grid = new THREE.GridHelper(14, 28, 0x3a3a3a, 0x1e1e1e);
+    const grid = new THREE.GridHelper(14, 28, 0x999999, 0xc8c8c4);
     grid.position.y = -1.005; scene.add(grid);
 
     let model = new THREE.Group();
@@ -633,7 +688,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   modalClose?.addEventListener('click', closeProjectModal);
   modalBackdrop?.addEventListener('click', closeProjectModal);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeProjectModal(); closeAdmin(); } });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (lightbox && !lightbox.hidden) closeLightbox();
+      else { closeProjectModal(); closeAdmin(); }
+    }
+  });
 
   /* ============================================================
      DATA LOADERS (RTDB)
@@ -697,6 +757,8 @@ document.addEventListener('DOMContentLoaded', () => {
         ...p,
         tags: Array.isArray(p.tags) ? p.tags : (p.tags || '').split(',').map(t => t.trim()).filter(Boolean),
         specs: Array.isArray(p.specs) ? p.specs : (p.specs || '').split('\n').map(s => s.trim()).filter(Boolean),
+        images: Array.isArray(p.images) ? p.images : [],
+        pdfs: Array.isArray(p.pdfs) ? p.pdfs : [],
         kicker: p.kicker || (p.category || 'PROJECT').toUpperCase(),
       }));
     } else {
@@ -752,15 +814,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  let authMode = 'signin'; // 'signin' | 'signup'
+  const authSubmitBtn = $('#authSubmitBtn');
+  const authHint = $('#authHint');
+
+  function setAuthMode(mode) {
+    authMode = mode;
+    $$('.auth-mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+    if (authSubmitBtn) authSubmitBtn.textContent = mode === 'signup' ? 'Create Account' : 'Sign In';
+    if (authHint) authHint.textContent = mode === 'signup'
+      ? 'Create a new admin account. You will be signed in after registration.'
+      : 'Sign in with your admin account to manage content.';
+    if (loginError) loginError.hidden = true;
+  }
+  $$('.auth-mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => setAuthMode(btn.dataset.mode));
+  });
+
   loginForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     loginError.hidden = true;
     const email = $('#adminEmail').value.trim();
     const password = $('#adminPassword').value;
+    if (password.length < 6) {
+      loginError.textContent = 'Password must be at least 6 characters.';
+      loginError.hidden = false;
+      return;
+    }
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      if (authMode === 'signup') {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
     } catch (err) {
-      loginError.textContent = err.message || 'Sign-in failed';
+      const map = {
+        'auth/email-already-in-use': 'That email is already registered. Try Sign In instead.',
+        'auth/invalid-email': 'Invalid email address.',
+        'auth/weak-password': 'Password is too weak (min 6 characters).',
+        'auth/user-not-found': 'No account found. Switch to Create Account.',
+        'auth/wrong-password': 'Incorrect password.',
+        'auth/invalid-credential': 'Invalid email or password.',
+        'auth/operation-not-allowed': 'Email/password auth is disabled in Firebase Console.',
+      };
+      loginError.textContent = map[err.code] || err.message || 'Authentication failed';
       loginError.hidden = false;
     }
   });
@@ -778,7 +875,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="admin-item">
           <div class="admin-item-info">
             <div class="admin-item-title">${p.title}</div>
-            <div class="admin-item-meta">${p.category || ''} · order ${p.order ?? 0}${p.modelUrl ? ' · GLB' : ''}</div>
+            <div class="admin-item-meta">${p.category || ''} · order ${p.order ?? 0}${p.modelUrl ? ' · GLB' : ''}${(p.images || []).length ? ` · ${p.images.length} img` : ''}${(p.pdfs || []).length ? ` · ${p.pdfs.length} pdf` : ''}</div>
           </div>
           <div class="admin-item-actions">
             <button type="button" data-edit-project="${p.id}">Edit</button>
@@ -856,12 +953,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ----- Project form ----- */
   const projectForm = $('#projectForm');
+  // Track existing media when editing (so new uploads append)
+  let editingImages = [];
+  let editingPdfs = [];
+
+  function renderMediaPreview(containerId, items, type) {
+    const el = $(containerId);
+    if (!el) return;
+    if (!items.length) { el.innerHTML = ''; return; }
+    el.innerHTML = items.map((item, i) => {
+      if (type === 'image') {
+        const url = typeof item === 'string' ? item : item.url;
+        return `<div class="admin-media-chip" data-idx="${i}">
+          <img src="${url}" alt="">
+          <span>Image ${i + 1}</span>
+          <button type="button" data-remove-img="${i}" aria-label="Remove">×</button>
+        </div>`;
+      }
+      const name = typeof item === 'string' ? (item.split('/').pop() || 'PDF') : (item.name || 'PDF');
+      return `<div class="admin-media-chip" data-idx="${i}">
+        <span>PDF · ${name}</span>
+        <button type="button" data-remove-pdf="${i}" aria-label="Remove">×</button>
+      </div>`;
+    }).join('');
+
+    el.querySelectorAll('[data-remove-img]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        editingImages.splice(+btn.dataset.removeImg, 1);
+        renderMediaPreview('#pImagesPreview', editingImages, 'image');
+      });
+    });
+    el.querySelectorAll('[data-remove-pdf]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        editingPdfs.splice(+btn.dataset.removePdf, 1);
+        renderMediaPreview('#pPdfsPreview', editingPdfs, 'pdf');
+      });
+    });
+  }
+
   $('#addProjectBtn')?.addEventListener('click', () => {
     projectForm.hidden = false;
     $('#projectFormTitle').textContent = 'New Project';
     $('#projectId').value = '';
     projectForm.reset();
     $('#pOrder').value = '0';
+    editingImages = [];
+    editingPdfs = [];
+    renderMediaPreview('#pImagesPreview', [], 'image');
+    renderMediaPreview('#pPdfsPreview', [], 'pdf');
   });
   $('#cancelProjectBtn')?.addEventListener('click', () => { projectForm.hidden = true; });
 
@@ -876,6 +1015,15 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#pTags').value = Array.isArray(p.tags) ? p.tags.join(', ') : (p.tags || '');
     $('#pSpecs').value = Array.isArray(p.specs) ? p.specs.join('\n') : (p.specs || '');
     $('#pOrder').value = p.order ?? 0;
+    editingImages = Array.isArray(p.images) ? [...p.images] : [];
+    editingPdfs = Array.isArray(p.pdfs) ? [...p.pdfs] : [];
+    renderMediaPreview('#pImagesPreview', editingImages, 'image');
+    renderMediaPreview('#pPdfsPreview', editingPdfs, 'pdf');
+    // Clear file inputs so only new selections are uploaded
+    if ($('#pGlb')) $('#pGlb').value = '';
+    if ($('#pThumb')) $('#pThumb').value = '';
+    if ($('#pImages')) $('#pImages').value = '';
+    if ($('#pPdfs')) $('#pPdfs').value = '';
   }
 
   async function uploadFile(file, path, onProgress) {
@@ -912,14 +1060,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const tags = $('#pTags').value.split(',').map(t => t.trim()).filter(Boolean);
     const specs = $('#pSpecs').value.split('\n').map(s => s.trim()).filter(Boolean);
     const order = parseInt($('#pOrder').value, 10) || 0;
-    const glbFile = $('#pGlb').files[0];
-    const thumbFile = $('#pThumb').files[0];
+    const glbFile = $('#pGlb')?.files?.[0];
+    const thumbFile = $('#pThumb')?.files?.[0];
+    const imageFiles = [...($('#pImages')?.files || [])];
+    const pdfFiles = [...($('#pPdfs')?.files || [])];
 
     try {
       let modelUrl = null;
       let thumbnailUrl = null;
+      let images = [...editingImages];
+      let pdfs = [...editingPdfs];
 
-      // Keep existing URLs if editing
       if (id) {
         const existing = liveProjects.find(p => p.id === id);
         if (existing) {
@@ -928,27 +1079,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      if (glbFile || thumbFile) {
+      const hasUploads = glbFile || thumbFile || imageFiles.length || pdfFiles.length;
+      if (hasUploads) {
         prog.hidden = false;
         fill.style.width = '0%';
       }
 
+      const totalSteps = (glbFile ? 1 : 0) + (thumbFile ? 1 : 0) + imageFiles.length + pdfFiles.length || 1;
+      let doneSteps = 0;
+      const bump = (label, pctInStep) => {
+        const overall = ((doneSteps + pctInStep / 100) / totalSteps) * 100;
+        fill.style.width = `${Math.min(overall, 99)}%`;
+        progText.textContent = `${label} ${Math.round(pctInStep)}%`;
+      };
+
       if (glbFile) {
-        progText.textContent = 'Uploading GLB…';
-        const path = `models/${Date.now()}_${glbFile.name}`;
-        modelUrl = await uploadFile(glbFile, path, (pct) => {
-          fill.style.width = `${pct * 0.7}%`;
-          progText.textContent = `Uploading GLB… ${Math.round(pct)}%`;
-        });
+        const path = `models/${Date.now()}_${glbFile.name.replace(/[^\w.\-]/g, '_')}`;
+        modelUrl = await uploadFile(glbFile, path, (pct) => bump('Uploading GLB…', pct));
+        doneSteps++;
       }
 
       if (thumbFile) {
-        progText.textContent = 'Uploading thumbnail…';
-        const path = `thumbnails/${Date.now()}_${thumbFile.name}`;
-        thumbnailUrl = await uploadFile(thumbFile, path, (pct) => {
-          fill.style.width = `${70 + pct * 0.3}%`;
-          progText.textContent = `Uploading thumbnail… ${Math.round(pct)}%`;
-        });
+        const path = `thumbnails/${Date.now()}_${thumbFile.name.replace(/[^\w.\-]/g, '_')}`;
+        thumbnailUrl = await uploadFile(thumbFile, path, (pct) => bump('Uploading cover…', pct));
+        doneSteps++;
+      }
+
+      for (const file of imageFiles) {
+        const path = `images/${Date.now()}_${file.name.replace(/[^\w.\-]/g, '_')}`;
+        const url = await uploadFile(file, path, (pct) => bump(`Uploading image ${doneSteps + 1}…`, pct));
+        images.push(url);
+        doneSteps++;
+      }
+
+      for (const file of pdfFiles) {
+        const path = `pdfs/${Date.now()}_${file.name.replace(/[^\w.\-]/g, '_')}`;
+        const url = await uploadFile(file, path, (pct) => bump(`Uploading PDF…`, pct));
+        pdfs.push({ name: file.name, url });
+        doneSteps++;
       }
 
       fill.style.width = '100%';
@@ -958,6 +1126,8 @@ document.addEventListener('DOMContentLoaded', () => {
         title, category, description, tags, specs, order,
         modelUrl: modelUrl || null,
         thumbnailUrl: thumbnailUrl || null,
+        images,
+        pdfs,
         updatedAt: Date.now(),
       };
 
@@ -970,6 +1140,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       projectForm.hidden = true;
       projectForm.reset();
+      editingImages = [];
+      editingPdfs = [];
+      renderMediaPreview('#pImagesPreview', [], 'image');
+      renderMediaPreview('#pPdfsPreview', [], 'pdf');
       prog.hidden = true;
     } catch (err) {
       console.error(err);
